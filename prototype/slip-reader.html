@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Slip Reader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --field:#123d2c; --field-deep:#0c2c20; --chalk:#f3f6f1; --chalk-dim:#b9c7bd;
+  --amber:#f5b301; --flag:#ff7a59; --line:rgba(243,246,241,.16); --panel:rgba(255,255,255,.05);
+  --bg:var(--field-deep); --text:var(--chalk); --muted:var(--chalk-dim); --surface:var(--field);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+:root[data-theme="light"]{
+  --bg:#eef2ec; --surface:#ffffff; --text:#0f2a1f; --muted:#4d6457; --line:rgba(15,42,31,.14);
+  --panel:rgba(15,42,31,.04); --amber:#b37f00; --flag:#c8462a;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#eef2ec; --surface:#ffffff; --text:#0f2a1f; --muted:#4d6457; --line:rgba(15,42,31,.14);
+    --panel:rgba(15,42,31,.04); --amber:#b37f00; --flag:#c8462a;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c2c20; --surface:#123d2c; --text:#f3f6f1; --muted:#b9c7bd; --line:rgba(243,246,241,.16);
+  --panel:rgba(255,255,255,.05); --amber:#f5b301; --flag:#ff7a59;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--text);
+  font:400 16px/1.5 Barlow, system-ui, -apple-system, "Segoe UI", sans-serif}
+main{max-width:640px;margin:0 auto;padding:28px 18px 64px}
+h1,h2,.num{font-family:"Big Shoulders Display", Impact, "Arial Narrow", sans-serif;font-weight:800;letter-spacing:.01em}
+h1{font-size:clamp(2.6rem,10vw,3.6rem);line-height:.95;margin:0 0 10px}
+h2{font-size:1.9rem;line-height:1;margin:0}
+p{margin:0}
+.lede{color:var(--muted);max-width:46ch}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+
+.drop{margin-top:26px;border:2px dashed var(--line);border-radius:18px;padding:34px 20px;text-align:center;
+  background:var(--panel);transition:border-color .15s, background .15s}
+.drop.over{border-color:var(--amber);background:color-mix(in srgb,var(--amber) 10%, transparent)}
+.drop strong{display:block;font-size:1.15rem;margin-bottom:4px}
+.drop span{color:var(--muted);font-size:.95rem}
+.btn{border:0;border-radius:12px;padding:12px 18px;font-weight:600;background:var(--amber);color:#1b1400}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+.row-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+.preview{display:flex;gap:14px;align-items:center;margin-top:18px}
+.preview img{width:64px;height:110px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.status{color:var(--muted);font-size:.95rem}
+.err{color:var(--flag)}
+
+.summary{display:flex;align-items:baseline;gap:14px;margin:30px 0 6px;flex-wrap:wrap}
+.summary .num{font-size:3.4rem;line-height:.9;color:var(--amber)}
+.summary small{color:var(--muted);font-size:1rem}
+.flagnote{color:var(--flag);font-weight:600}
+
+.legs{list-style:none;margin:18px 0 0;padding:0;border-top:1px solid var(--line)}
+.leg{padding:14px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;gap:6px 12px}
+.leg.review{box-shadow:inset 3px 0 0 var(--flag);padding-left:12px}
+.leg .pick{font-weight:600;font-size:1.08rem;background:transparent;border:0;border-bottom:1px solid transparent;padding:2px 0;width:100%}
+.leg input,.leg select{background:transparent;border:0;border-bottom:1px solid var(--line);padding:3px 0;min-width:0}
+.leg input:hover,.leg select:hover,.leg .pick:hover{border-bottom-color:var(--muted)}
+.leg select option{color:#111}
+.meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:.95rem;grid-column:1/-1}
+.meta .vs{flex:1 1 160px}
+.meta .line{width:80px}
+.why{grid-column:1/-1;color:var(--flag);font-size:.9rem}
+.x{background:transparent;border:0;color:var(--muted);font-size:1.4rem;line-height:1;padding:2px 6px;align-self:start}
+.foot{display:flex;gap:10px;margin-top:22px;flex-wrap:wrap}
+
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:22px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+.tile .team{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.tile .team.mine::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--amber);align-self:center;margin-right:6px;flex:none}
+.tile .team span:first-child{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile .score{font-family:"Big Shoulders Display",Impact,sans-serif;font-size:1.3rem;color:var(--muted)}
+.tile .tag{margin:0;font-size:.85rem;color:var(--muted)}
+.tagrow{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.grip{background:transparent;border:1px solid var(--line);border-radius:8px;color:var(--muted);font-size:1.1rem;line-height:1;padding:6px 8px;cursor:grab;touch-action:none;flex:none}
+.grip:active{cursor:grabbing}
+.tile.dragging{outline:2px solid var(--amber);opacity:.85;transform:scale(1.02)}
+.bar{margin-top:22px;padding:14px 16px;border-radius:14px;background:var(--panel);border:1px solid var(--line);color:var(--muted)}
+.bar b{color:var(--text)}
+.nav{display:flex;gap:6px;margin-bottom:22px}
+.nav button{background:transparent;border:1px solid var(--line);border-radius:999px;padding:7px 14px;color:var(--muted);font-weight:600}
+.nav button[aria-current="page"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+.grade{display:flex;gap:4px;margin-top:10px}
+.grade button{flex:1;background:transparent;border:1px solid var(--line);border-radius:8px;padding:5px 0;font-size:.85rem;font-weight:600;color:var(--muted)}
+.grade button[aria-pressed="true"][data-r="won"]{background:#2f9e5b;border-color:#2f9e5b;color:#fff}
+.grade button[aria-pressed="true"][data-r="lost"]{background:var(--flag);border-color:var(--flag);color:#fff}
+.grade button[aria-pressed="true"][data-r="push"]{background:var(--muted);border-color:var(--muted);color:var(--bg)}
+.tile.won{box-shadow:inset 0 3px 0 #2f9e5b}.tile.lost{box-shadow:inset 0 3px 0 var(--flag)}
+.record{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:8px 0 4px}
+.record .num{font-size:4.2rem;line-height:.9;color:var(--amber)}
+.record small{color:var(--muted);font-size:1rem}
+.split{width:100%;border-collapse:collapse;margin-top:10px}
+.split th,.split td{text-align:left;padding:10px 0;border-bottom:1px solid var(--line)}
+.split th{color:var(--muted);font-weight:500;font-size:.9rem}
+.split td.r,.split th.r{text-align:right}
+.split td .num{font-size:1.35rem}
+.stats-block{margin-top:30px}
+.stats-block h3{font-family:"Big Shoulders Display",Impact,sans-serif;font-size:1.5rem;margin:0}
+.slips{list-style:none;padding:0;margin:10px 0 0}
+.slips li{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.slips li .info{flex:1;min-width:0}
+.slips li .info b{display:block}
+.slips li .info span{color:var(--muted);font-size:.9rem}
+.pill{font-size:.8rem;font-weight:700;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.pill.won{background:#2f9e5b;border-color:#2f9e5b;color:#fff}.pill.lost{background:var(--flag);border-color:var(--flag);color:#fff}
+.saved{color:var(--muted);font-size:.9rem;align-self:center}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <nav class="nav" aria-label="Sections">
+    <button type="button" id="navRead" aria-current="page">Read a slip</button>
+    <button type="button" id="navStats">My record</button>
+  </nav>
+  <section id="upload">
+    <h1>Slip Reader</h1>
+    <p class="lede">Drop in a screenshot of any bet slip. It pulls out every leg so you can check them before they go on your board.</p>
+
+    <div class="drop" id="drop">
+      <strong>Drop a slip screenshot here</strong>
+      <span>Kalshi, FanDuel, DraftKings, or any other app</span>
+      <div class="row-actions">
+        <label class="btn" for="file" id="pickLabel">Choose screenshot</label>
+        <button class="btn ghost" id="demo" type="button">Try a sample slip</button>
+      </div>
+      <input type="file" id="file" accept="image/png,image/jpeg,image/webp" hidden>
+    </div>
+
+    <div class="preview" id="preview" hidden>
+      <img id="thumb" alt="Your uploaded slip">
+      <div>
+        <p class="status" id="status">Reading your slip…</p>
+        <button class="btn ghost" id="stop" type="button" hidden style="margin-top:8px">Stop</button>
+      </div>
+    </div>
+    <p class="status err" id="unavailable" hidden style="margin-top:14px">Reading screenshots works when this page is opened in Claude. You can still try the sample slip.</p>
+  </section>
+
+  <section id="review" hidden>
+    <div class="summary">
+      <span class="num" id="count">0</span>
+      <div>
+        <h2>legs found</h2>
+        <small id="source"></small>
+      </div>
+    </div>
+    <p id="flagSummary" class="flagnote" hidden></p>
+    <p class="status">Tap any field to fix it.</p>
+    <ul class="legs" id="legs"></ul>
+    <div class="foot">
+      <button class="btn ghost" id="addLeg" type="button">Add a leg</button>
+      <button class="btn" id="confirm" type="button">Build my board</button>
+      <button class="btn ghost" id="restart" type="button">Read another slip</button>
+    </div>
+  </section>
+
+  <section id="boardView" hidden>
+    <h2 style="font-size:2.4rem">Your board</h2>
+    <div class="bar" id="parlayBar"></div>
+    <div class="board" id="board"></div>
+    <p class="status" style="margin-top:18px">Drag any tile by its handle to reorder your board. Scores are blank in this prototype. Once a live data feed is connected, each tile fills in and shows whether that leg is winning.</p>
+    <div class="foot">
+      <button class="btn" id="saveSlip" type="button">Save to my record</button>
+      <button class="btn ghost" id="backEdit" type="button">Edit legs</button>
+      <span class="saved" id="savedNote" hidden>Saved. Results update your record as you mark them.</span>
+    </div>
+  </section>
+
+  <section id="statsView" hidden>
+    <h2 style="font-size:2.4rem">My record</h2>
+    <div id="statsEmpty" class="status" style="margin-top:12px">No saved slips yet. Read a slip, build your board, then save it to start your record.</div>
+    <div id="statsBody" hidden>
+      <div class="record"><span class="num" id="legRecord">0-0</span><div><b>Legs</b><br><small id="legPct"></small></div></div>
+      <p class="status" id="slipRecord"></p>
+      <div class="stats-block"><h3>By bet type</h3><table class="split" id="byType"></table></div>
+      <div class="stats-block"><h3>By league</h3><table class="split" id="byLeague"></table></div>
+      <div class="stats-block"><h3>Saved slips</h3><ul class="slips" id="slipList"></ul></div>
+    </div>
+    <p class="status" id="storeNote" style="margin-top:22px"></p>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let legs = [];
+let sourceName = "";
+let sample = null;
+let ctl = null;
+
+const PROMPT = `You are reading a screenshot of a sports bet slip or prediction-market combo (Kalshi, FanDuel, DraftKings, etc.).
+Extract every leg. Reply with only JSON in this shape:
+{"source": string (app name if visible, else ""),
+ "legs": [{"pick": string, "opponent": string|null, "league": string, "bet_type": "moneyline"|"spread"|"total"|"prop"|"other", "line": string, "price": string, "needs_review": boolean, "review_reason": string}]}
+Rules:
+- "pick" is the team or player the bettor is backing, as written but expanded if you are sure (e.g. "Oklahoma St.").
+- "opponent": if the text is truncated or missing, give your best guess only if you are confident; otherwise null. Never invent one.
+- "league": e.g. "NCAA Football", "NFL", "NBA". Use the slip's section header if shown.
+- "line": the spread or total like "-7.5" or "o48.5"; "" for moneylines.
+- "price": odds or probability as shown, e.g. "-150" or "86%"; "" if none.
+- Set needs_review true when any name is cut off, ambiguous, or you guessed; explain briefly in review_reason. Otherwise review_reason is "".
+- Keep legs in the order shown.`;
+
+(async () => {
+  try {
+    sample = await window.claude?.use("sample");
+    if (sample) {
+      const lim = await sample.limits().catch(() => null);
+      if (!lim?.images) sample = null;
+    }
+  } catch { sample = null; }
+  if (!sample) { $("pickLabel").hidden = true; $("unavailable").hidden = false; }
+})();
+
+function show(section){
+  ["upload","review","boardView","statsView"].forEach(s => $(s).hidden = s !== section);
+  $("navRead").setAttribute("aria-current", section === "statsView" ? "false" : "page");
+  $("navStats").setAttribute("aria-current", section === "statsView" ? "page" : "false");
+  window.scrollTo(0,0);
+}
+
+async function readSlip(file){
+  if (!sample) return;
+  $("preview").hidden = false;
+  $("thumb").src = URL.createObjectURL(file);
+  $("status").textContent = "Reading your slip… this can take up to a minute.";
+  $("status").classList.remove("err");
+  $("stop").hidden = false;
+  ctl = new AbortController();
+  try {
+    const data = await sample.json(PROMPT, { images: file, signal: ctl.signal });
+    const got = Array.isArray(data?.legs) ? data.legs : [];
+    if (!got.length) throw { code: "no_legs" };
+    legs = got.map(normalize); currentSlipId = null;
+    sourceName = String(data?.source || "");
+    renderReview(); show("review");
+    $("preview").hidden = true;
+  } catch (e) {
+    $("status").classList.add("err");
+    $("status").textContent = errorCopy(e?.code);
+    if (e?.code === "not_granted" || e?.code === "sampling_disabled") { $("pickLabel").hidden = true; }
+  } finally { $("stop").hidden = true; }
+}
+
+function errorCopy(code){
+  switch(code){
+    case "cancelled": return "Stopped. Choose a screenshot to try again.";
+    case "no_legs": return "No bet legs found in that image. Try a tighter screenshot of the slip.";
+    case "invalid_json": return "The slip couldn't be read cleanly. Try again, or crop closer to the legs.";
+    case "image_rejected": return "That file can't be read. Use a PNG or JPG screenshot.";
+    case "rate_limited": return "Too many reads in a short time. Wait a minute and try again.";
+    case "not_granted": return "Reading slips needs permission to use Claude. Allow it when asked, or try the sample slip.";
+    case "refused": return "This image couldn't be processed. Try a different screenshot.";
+    default: return "Something interrupted the read. Try again.";
+  }
+}
+
+function normalize(l){
+  return {
+    pick: String(l?.pick ?? "").trim(),
+    opponent: l?.opponent ? String(l.opponent).trim() : "",
+    league: String(l?.league ?? "").trim(),
+    bet_type: ["moneyline","spread","total","prop","other"].includes(l?.bet_type) ? l.bet_type : "other",
+    line: String(l?.line ?? "").trim(),
+    price: String(l?.price ?? "").trim(),
+    needs_review: !!l?.needs_review || !l?.opponent,
+    review_reason: String(l?.review_reason || (!l?.opponent ? "Opponent missing or cut off." : "")).trim(),
+    result: ["won","lost","push"].includes(l?.result) ? l.result : "pending"
+  };
+}
+
+function renderReview(){
+  $("count").textContent = legs.length;
+  $("source").textContent = sourceName ? "from " + sourceName : "";
+  const flagged = legs.filter(l => l.needs_review).length;
+  $("flagSummary").hidden = !flagged;
+  $("flagSummary").textContent = flagged === 1 ? "1 leg needs a look." : flagged + " legs need a look.";
+  const ul = $("legs"); ul.textContent = "";
+  legs.forEach((l, i) => {
+    const li = document.createElement("li");
+    li.className = "leg" + (l.needs_review ? " review" : "");
+    li.innerHTML = `
+      <input class="pick" aria-label="Pick">
+      <button class="x" type="button" aria-label="Remove leg">×</button>
+      <div class="meta">
+        <span>vs</span><input class="vs" aria-label="Opponent" placeholder="Opponent">
+        <select aria-label="Bet type">
+          <option value="moneyline">To win</option><option value="spread">Spread</option>
+          <option value="total">Total</option><option value="prop">Prop</option><option value="other">Other</option>
+        </select>
+        <input class="line" aria-label="Line" placeholder="Line">
+        <span class="price"></span>
+      </div>
+      ${l.needs_review && l.review_reason ? '<p class="why"></p>' : ''}`;
+    const [pick, vs, line] = [li.querySelector(".pick"), li.querySelector(".vs"), li.querySelector(".line")];
+    const sel = li.querySelector("select");
+    pick.value = l.pick; vs.value = l.opponent; line.value = l.line; sel.value = l.bet_type;
+    line.hidden = l.bet_type === "moneyline";
+    li.querySelector(".price").textContent = [l.league, l.price].filter(Boolean).join(", ");
+    const why = li.querySelector(".why"); if (why) why.textContent = l.review_reason;
+    pick.oninput = () => l.pick = pick.value;
+    vs.oninput = () => { l.opponent = vs.value; };
+    vs.onchange = () => { if (vs.value.trim()) { l.needs_review = false; renderReview(); } };
+    line.oninput = () => l.line = line.value;
+    sel.onchange = () => { l.bet_type = sel.value; line.hidden = sel.value === "moneyline"; };
+    li.querySelector(".x").onclick = () => { legs.splice(i,1); renderReview(); };
+    ul.appendChild(li);
+  });
+}
+
+function renderBoard(){
+  const b = $("board"); b.textContent = "";
+  legs.forEach(l => {
+    const t = document.createElement("div"); t.className = "tile"; t.dataset.i = b.children.length;
+    t.innerHTML = `<div class="team mine"><span></span><span class="score">–</span></div>
+      <div class="team"><span></span><span class="score">–</span></div>
+      <div class="tagrow"><p class="tag"></p><button class="grip" type="button" aria-label="Drag to reorder, or use arrow keys">⠿</button></div>
+      <div class="grade" role="group" aria-label="Mark result">
+        <button type="button" data-r="won">Won</button><button type="button" data-r="lost">Lost</button><button type="button" data-r="push">Push</button>
+      </div>`;
+    if (l.result === "won" || l.result === "lost") t.classList.add(l.result);
+    t.querySelectorAll(".grade button").forEach(btn => {
+      btn.setAttribute("aria-pressed", String(l.result === btn.dataset.r));
+      btn.onclick = () => { l.result = l.result === btn.dataset.r ? "pending" : btn.dataset.r; renderBoard(); if (currentSlipId) persistCurrent(); };
+    });
+    const names = t.querySelectorAll(".team span:first-child");
+    names[0].textContent = l.pick || "Pick";
+    names[1].textContent = l.opponent || "Opponent";
+    const label = l.bet_type === "moneyline" ? "To win" : (l.bet_type[0].toUpperCase() + l.bet_type.slice(1) + (l.line ? " " + l.line : ""));
+    t.querySelector(".tag").textContent = [label, l.league].filter(Boolean).join(", ") + ". Not started";
+    b.appendChild(t);
+  });
+  const c = countResults(legs);
+  $("parlayBar").textContent = `${legs.length} legs tracked. ${c.won} won, ${c.lost} lost, ${c.push} push, ${c.pending} not graded.`;
+}
+
+const DEMO = { source: "Sample slip", legs: [
+  {pick:"Ridgeview St.", opponent:"Lakeport", league:"NCAA Football", bet_type:"moneyline", line:"", price:"84%", needs_review:false, review_reason:""},
+  {pick:"Harbor City", opponent:"Northfield", league:"NFL", bet_type:"spread", line:"-3.5", price:"-110", needs_review:false, review_reason:""},
+  {pick:"Mesa Tech", opponent:null, league:"NCAA Football", bet_type:"moneyline", line:"", price:"91%", needs_review:true, review_reason:"Opponent name is cut off on the slip."},
+  {pick:"Over", opponent:"Granite Bay vs Westvale", league:"NBA", bet_type:"total", line:"o221.5", price:"-105", needs_review:false, review_reason:""}
+]};
+
+$("file").onchange = (e) => { const f = e.target.files?.[0]; if (f) readSlip(f); e.target.value = ""; };
+const drop = $("drop");
+drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+drop.addEventListener("drop", e => { e.preventDefault(); drop.classList.remove("over"); const f = e.dataTransfer.files?.[0]; if (f && sample) readSlip(f); });
+$("stop").onclick = () => ctl?.abort();
+$("demo").onclick = () => { currentSlipId = null; legs = DEMO.legs.map(normalize); sourceName = DEMO.source; renderReview(); show("review"); };
+$("addLeg").onclick = () => { legs.push(normalize({pick:"", opponent:"", bet_type:"moneyline"})); renderReview(); };
+$("confirm").onclick = () => { legs = legs.filter(l => l.pick.trim()); if (currentSlipId) persistCurrent(); renderBoard(); $("savedNote").hidden = !currentSlipId; $("saveSlip").hidden = !!currentSlipId; show("boardView"); };
+$("restart").onclick = () => { $("preview").hidden = true; currentSlipId = null; show("upload"); };
+$("backEdit").onclick = () => { renderReview(); show("review"); };
+
+// Drag-to-reorder board tiles (pointer events work for mouse and touch)
+let dragTile = null;
+const board = $("board");
+function syncOrder(){
+  const order = [...board.children].map(t => +t.dataset.i);
+  legs = order.map(i => legs[i]);
+  [...board.children].forEach((t, k) => t.dataset.i = k);
+}
+board.addEventListener("pointerdown", e => {
+  const grip = e.target.closest(".grip"); if (!grip) return;
+  dragTile = grip.closest(".tile"); dragTile.classList.add("dragging");
+  grip.setPointerCapture(e.pointerId); e.preventDefault();
+});
+board.addEventListener("pointermove", e => {
+  if (!dragTile) return;
+  const over = document.elementFromPoint(e.clientX, e.clientY)?.closest(".tile");
+  if (!over || over === dragTile || over.parentNode !== board) return;
+  const tiles = [...board.children];
+  if (tiles.indexOf(dragTile) < tiles.indexOf(over)) over.after(dragTile); else over.before(dragTile);
+});
+const endDrag = () => { if (!dragTile) return; dragTile.classList.remove("dragging"); dragTile = null; syncOrder(); };
+board.addEventListener("pointerup", endDrag);
+board.addEventListener("pointercancel", endDrag);
+board.addEventListener("keydown", e => {
+  const grip = e.target.closest(".grip"); if (!grip) return;
+  const tile = grip.closest(".tile");
+  if (e.key === "ArrowUp" || e.key === "ArrowLeft") { if (tile.previousElementSibling) { tile.previousElementSibling.before(tile); syncOrder(); grip.focus(); } e.preventDefault(); }
+  if (e.key === "ArrowDown" || e.key === "ArrowRight") { if (tile.nextElementSibling) { tile.nextElementSibling.after(tile); syncOrder(); grip.focus(); } e.preventDefault(); }
+});
+
+// ---------- Record keeping ----------
+let currentSlipId = null;
+let slips = [];
+let store = null;
+
+function countResults(list){
+  const c = {won:0, lost:0, push:0, pending:0};
+  list.forEach(l => c[l.result in c ? l.result : "pending"]++);
+  return c;
+}
+function slipStatus(s){
+  const c = countResults(s.legs);
+  if (c.lost) return "lost";
+  if (!c.pending && c.won) return "won";
+  if (!c.pending) return "push";
+  return "open";
+}
+
+async function initStore(){
+  try {
+    const db = await window.claude?.use("db");
+    const user = await window.claude?.use("user");
+    const uid = db && user ? await user.id() : null;
+    if (db && uid) {
+      const col = db.collection("data/users/" + uid);
+      store = {
+        kind: "account",
+        async list(){ const snap = await col.get(); return snap.docs.map(d => d.data()).filter(d => d && d.kind === "slip"); },
+        async save(s){ await col.doc(s.id).set(s); },
+        async remove(id){ await col.doc(id).delete(); }
+      };
+    }
+  } catch { store = null; }
+  if (!store) {
+    store = {
+      kind: "browser",
+      async list(){ try { return JSON.parse(localStorage.getItem("slipreader:slips") || "[]"); } catch { return []; } },
+      async save(s){ const all = (await this.list()).filter(x => x.id !== s.id); all.push(s); try { localStorage.setItem("slipreader:slips", JSON.stringify(all)); } catch {} },
+      async remove(id){ const all = (await this.list()).filter(x => x.id !== id); try { localStorage.setItem("slipreader:slips", JSON.stringify(all)); } catch {} }
+    };
+  }
+  slips = await store.list();
+  $("storeNote").textContent = store.kind === "account"
+    ? "Your record is saved privately to your account."
+    : "Your record is saved in this browser only.";
+}
+initStore();
+
+function plainLegs(){ return legs.map(l => ({pick:l.pick, opponent:l.opponent, league:l.league, bet_type:l.bet_type, line:l.line, price:l.price, result:l.result})); }
+
+async function persistCurrent(){
+  if (!store || !currentSlipId) return;
+  const existing = slips.find(s => s.id === currentSlipId);
+  const s = { kind:"slip", id: currentSlipId, source: sourceName, savedAt: existing?.savedAt || new Date().toISOString(), legs: plainLegs() };
+  slips = slips.filter(x => x.id !== s.id).concat(s);
+  try { await store.save(s); } catch { $("savedNote").textContent = "Couldn't save just now. Your results are still on screen."; }
+}
+
+$("saveSlip").onclick = async () => {
+  currentSlipId = "slip_" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  await persistCurrent();
+  $("saveSlip").hidden = true; $("savedNote").hidden = false;
+};
+
+function rowsFor(groupKey, labelFn){
+  const groups = {};
+  slips.forEach(s => s.legs.forEach(l => {
+    const k = groupKey(l) || "Other";
+    (groups[k] ||= {won:0, lost:0, push:0, pending:0})[l.result in groups[k] ? l.result : "pending"]++;
+  }));
+  return Object.entries(groups).sort((a,b) => (b[1].won+b[1].lost) - (a[1].won+a[1].lost)).map(([k,c]) => [labelFn(k), c]);
+}
+function pct(c){ const d = c.won + c.lost; return d ? Math.round(c.won / d * 100) + "%" : "–"; }
+function rec(c){ return `${c.won}-${c.lost}` + (c.push ? `-${c.push}` : ""); }
+function fillTable(el, rows){
+  el.innerHTML = '<tr><th></th><th class="r">Record</th><th class="r">Win rate</th></tr>';
+  rows.forEach(([label, c]) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = '<td></td><td class="r"><span class="num"></span></td><td class="r"></td>';
+    tr.children[0].textContent = label;
+    tr.querySelector(".num").textContent = rec(c);
+    tr.children[2].textContent = pct(c);
+    el.appendChild(tr);
+  });
+}
+const TYPE_LABELS = {moneyline:"Moneylines", spread:"Spreads", total:"Over/unders", prop:"Props", other:"Other"};
+
+function renderStats(){
+  $("statsEmpty").hidden = !!slips.length; $("statsBody").hidden = !slips.length;
+  if (!slips.length) return;
+  const all = countResults(slips.flatMap(s => s.legs));
+  $("legRecord").textContent = rec(all);
+  $("legPct").textContent = `${pct(all)} win rate` + (all.pending ? `, ${all.pending} not graded` : "");
+  const st = slips.map(slipStatus);
+  const won = st.filter(x => x === "won").length, lost = st.filter(x => x === "lost").length, open = st.filter(x => x === "open").length;
+  $("slipRecord").textContent = `Slips: ${won} won, ${lost} lost` + (open ? `, ${open} still open` : "") + ".";
+  fillTable($("byType"), rowsFor(l => l.bet_type, k => TYPE_LABELS[k] || k));
+  fillTable($("byLeague"), rowsFor(l => l.league, k => k));
+  const ul = $("slipList"); ul.textContent = "";
+  [...slips].sort((a,b) => b.savedAt.localeCompare(a.savedAt)).forEach(s => {
+    const li = document.createElement("li");
+    const status = slipStatus(s);
+    li.innerHTML = '<div class="info"><b></b><span></span></div><span class="pill"></span><button class="btn ghost" type="button">Open</button><button class="x" type="button" aria-label="Delete slip">×</button>';
+    li.querySelector("b").textContent = `${s.legs.length}-leg slip` + (s.source ? ` from ${s.source}` : "");
+    const c = countResults(s.legs);
+    li.querySelector(".info span").textContent = new Date(s.savedAt).toLocaleDateString(undefined, {month:"short", day:"numeric"}) + `, ${rec(c)}`;
+    const pill = li.querySelector(".pill"); pill.textContent = status === "open" ? "Open" : status[0].toUpperCase() + status.slice(1);
+    if (status === "won" || status === "lost") pill.classList.add(status);
+    li.querySelector(".btn").onclick = () => { currentSlipId = s.id; sourceName = s.source || ""; legs = s.legs.map(normalize); renderBoard(); $("saveSlip").hidden = true; $("savedNote").hidden = false; show("boardView"); };
+    li.querySelector(".x").onclick = async (ev) => { const b = ev.currentTarget; if (!b.dataset.armed) { b.dataset.armed = "1"; b.textContent = "Delete?"; b.style.fontSize = ".9rem"; b.style.color = "var(--flag)"; return; } slips = slips.filter(x => x.id !== s.id); try { await store.remove(s.id); } catch {} if (currentSlipId === s.id) currentSlipId = null; renderStats(); };
+    ul.appendChild(li);
+  });
+}
+
+$("navStats").onclick = () => { renderStats(); show("statsView"); };
+$("navRead").onclick = () => { if (currentSlipId || legs.length) { renderBoard(); show(legs.length ? "boardView" : "upload"); } else show("upload"); };
+</script>
+</body>
+</html>
