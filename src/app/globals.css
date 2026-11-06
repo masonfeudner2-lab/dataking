@@ -641,3 +641,198 @@ button {
     transition: none !important;
   }
 }
+
+/* ---------- Read a slip (Phase B) ---------- */
+a.btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.row-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 14px;
+}
+.crumbs {
+  margin-bottom: 14px;
+}
+.crumbs a {
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+}
+.lede {
+  margin-top: 10px;
+  max-width: 52ch;
+}
+.drop {
+  margin-top: 22px;
+  border: 2px dashed var(--line);
+  border-radius: 18px;
+  padding: 30px 18px;
+  text-align: center;
+  background: var(--panel);
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+}
+.drop.over {
+  border-color: var(--amber);
+}
+.drop strong {
+  font-size: 1.15rem;
+}
+.reading {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+.thumbs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.thumbs img {
+  width: 60px;
+  height: 104px;
+  object-fit: cover;
+  object-position: top;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+.passcode {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+  margin-top: 14px;
+}
+.passcode label,
+.draft-row label,
+.draft-game {
+  display: grid;
+  gap: 2px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+.passcode input,
+.draft input,
+.draft select {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  min-height: 40px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
+  min-width: 0;
+}
+.draft select option,
+.draft select optgroup {
+  color: #111;
+}
+.summary {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 6px 0 6px;
+}
+.summary .num {
+  font-size: 3.4rem;
+  line-height: 0.9;
+  color: var(--amber);
+}
+.flagnote {
+  color: var(--flag);
+  font-weight: 600;
+  margin-top: 6px;
+}
+.drafts {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.draft {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px 12px 12px;
+  display: grid;
+  gap: 10px;
+}
+.draft.flagged {
+  border-color: var(--flag);
+  box-shadow: inset 4px 0 0 var(--flag);
+}
+.draft-head {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.draft .draft-pick {
+  flex: 1;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.draft-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+.draft-game select {
+  width: 100%;
+}
+.side {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.side button {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-weight: 600;
+  min-height: 38px;
+}
+.side button[aria-pressed="true"] {
+  background: var(--amber);
+  border-color: var(--amber);
+  color: var(--on-amber);
+}
+.why {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--flag);
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+.why ul {
+  margin: 0;
+  padding-left: 18px;
+}
+.small-btn {
+  min-height: 36px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  flex: none;
+}
+.foot {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}

@@ -143,6 +143,18 @@ export interface BoardState {
 const BOARD_KEY = "dk:board:v1";
 const EMPTY: BoardState = { slip: null, order: [], extra: [], hidden: [] };
 
+/** The slip currently on the board (read outside the board screen). */
+export function readBoardSlip(): Slip | null {
+  return load<BoardState>(BOARD_KEY, EMPTY).slip;
+}
+
+/** Put a slip on the board. Editing the same slip keeps your tile order and picked games. */
+export function writeBoardSlip(slip: Slip) {
+  const prev = load<BoardState>(BOARD_KEY, EMPTY);
+  const same = prev.slip?.id === slip.id;
+  save(BOARD_KEY, same ? { ...prev, slip } : { slip, order: [], extra: [], hidden: [] });
+}
+
 export function useBoard() {
   const [board, setBoard] = useState<BoardState>(EMPTY);
   const [ready, setReady] = useState(false);

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   DndContext,
@@ -54,16 +55,24 @@ export default function BoardPage() {
       <header className="top">
         <h1>Your board</h1>
         <div className="top-actions">
+          <Link className="btn" href="/read">
+            Read a slip
+          </Link>
+          {b.board.slip && (
+            <Link className="btn ghost" href="/read?edit=1">
+              Edit legs
+            </Link>
+          )}
           <button className="btn ghost" type="button" onClick={() => setPicking(true)}>
             Pick games
           </button>
-          {b.board.slip ? (
-            <button className="btn ghost" type="button" onClick={b.clearSlip}>
+          {b.board.slip && (
+            <button
+              className="btn ghost"
+              type="button"
+              onClick={() => window.confirm("Take this slip off your board?") && b.clearSlip()}
+            >
               Clear slip
-            </button>
-          ) : (
-            <button className="btn" type="button" onClick={() => b.loadSlip(makeSampleSlip())}>
-              Load sample slip
             </button>
           )}
         </div>
@@ -76,9 +85,15 @@ export default function BoardPage() {
           <p>
             <b>Nothing on your board yet.</b>
           </p>
-          <p className="muted">
-            Load the sample 18-leg slip to see how it works, or pick any games to follow. Reading a slip screenshot comes in the next phase.
-          </p>
+          <p className="muted">Read a slip screenshot to fill your board, pick any games to follow, or load a sample board to look around.</p>
+          <div className="row-actions">
+            <Link className="btn" href="/read">
+              Read a slip
+            </Link>
+            <button className="btn ghost" type="button" onClick={() => b.loadSlip(makeSampleSlip())}>
+              Load sample board
+            </button>
+          </div>
         </div>
       )}
 

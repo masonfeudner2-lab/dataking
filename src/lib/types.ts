@@ -19,8 +19,6 @@ export interface Team {
   league: League;
   /** College subdivision, e.g. FBS / FCS for football. */
   division?: string;
-  /** Other ways the name shows up on slips. Used for matching in Phase B. */
-  aliases?: string[];
 }
 
 export type GameStatus = "scheduled" | "in_progress" | "halftime" | "final";
