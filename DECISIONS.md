@@ -31,6 +31,9 @@ A running log in plain language. Newest entries at the bottom of each section.
 | 23 | 2026-11-06 | **Optional passcode (`SLIP_READER_PASSCODE`)** for slip reading. | A public link means anyone could spend your Claude credit. Accounts (Phase C) will replace this. |
 | 24 | 2026-11-06 | **Hit-rate providers (recommendation): CFBD/CBBD for college, BALLDONTLIE for NBA/NFL**, starting NBA-only on the cheapest plan. | Cheapest options whose terms appear to allow commercial use. Must confirm in writing (Q4). |
 | 25 | 2026-11-12 | **Once a leg is matched, the board shows the schedule's team name** ("Prairie View A&M"), not the slip's shorthand ("Prairie View"). The slip's wording is still shown in the game details ("On your slip: …"). **The confirm screen flags duplicate legs** (same game, bet type, team and line). | Found in your Vercel test: a shorthand label looked like a different team, and a leg put on the wrong game duplicated another leg without warning. |
+| 26 | 2026-11-12 | **Pro team nicknames match on their own** ("LA Lakers", "MIL Bucks", "GS Warriors", "Bucks"), for NFL and NBA, without needing an alias row. | Kalshi writes teams as "city abbreviation + nickname". Nicknames are unique within a pro league. |
+| 27 | 2026-11-12 | **If a slip names both teams and no scheduled game has both, the leg says "X vs Y isn't on today's schedule"** and offers each team's game as a choice. It no longer picks the closest game. | Your first real Kalshi slip: "Lakers vs Bucks" was pointed at a different Lakers game. |
+| 28 | 2026-11-12 | **Kalshi Yes/No phrasing is converted when the slip is read:** "Yes · X win by over N" = X −N; "No · X win by over N" = the other team +N; "Over N points" = total. Whole-number N is flagged. | It's a straight conversion, so it shouldn't flag every leg. With a whole number, an exact-margin result settles differently from a spread push. |
 
 ## Open questions
 
@@ -46,4 +49,5 @@ A running log in plain language. Newest entries at the bottom of each section.
 | Q8 | **Overtime / ties in grading.** | Real feeds report the final including overtime, which the grading already uses. Some apps grade "regulation only" bets differently: handle when it comes up. |
 | Q9 | **BALLDONTLIE's "grade or settle wagers" restriction vs. auto-grading prop legs (Phase F).** | Ask them (draft email in `docs/hit-rate-providers.md`). If it's a problem, props stay hand-graded or use another source. |
 | Q10 | **Slips that span several days** (e.g. Saturday college + Sunday NFL). | Matching only checks today's games right now. Phase D will search a few days ahead when the real schedule is plugged in. |
-| Q11 | **Real-world accuracy of slip reading.** | Not tested on real slips yet (needs your API key). Send 3–5 real screenshots, especially long Kalshi ones, and we'll tune the prompt and alias table. |
+| Q11 | **Real-world accuracy of slip reading.** | First real Kalshi slip (7-leg NBA combo): all 7 legs read correctly, including the "No · win by over" conversion. Matching failed only because the app still uses the fake schedule. More real slips welcome. |
+| Q12 | **Move real scores (Phase D) ahead of accounts (Phase C)?** | Real slips need the real schedule to match and grade. Recommended. Waiting on your call. |

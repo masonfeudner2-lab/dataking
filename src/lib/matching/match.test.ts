@@ -74,10 +74,11 @@ describe("matching legs to games", () => {
     expect(matchLeg(leg("Under", "UCLA vs Gonzaga", "College Basketball", "total"), g)).toMatchObject({ gameId: "m-ucla-gonz", confidence: "high" });
   });
 
-  it("flags a wrong opponent instead of trusting it", async () => {
+  it("a wrong opponent isn't trusted: no game is chosen, but the pick's real game is offered", async () => {
     const r = matchLeg(leg("Ohio State", "Michigan", "NCAAF", "spread"), await slate());
-    expect(r.confidence).toBe("low");
-    expect(r.gameId).toBe("m-psu-osu");
+    expect(r).toMatchObject({ gameId: null, confidence: "none" });
+    expect(r.note).toMatch(/isn't on today's schedule/);
+    expect(r.candidates).toContain("m-psu-osu");
   });
 
   it("props without a team name ask the user", async () => {
@@ -87,5 +88,35 @@ describe("matching legs to games", () => {
 
   it("unknown teams come back unmatched", async () => {
     expect(matchLeg(leg("Vanderbilt", "Georgia", "NCAAF"), await slate())).toMatchObject({ gameId: null, confidence: "none" });
+  });
+});
+
+describe("Kalshi-style names and matchups (from a real slip)", () => {
+  const team = (teamId: string, name: string, short: string) => ({ teamId, name, short, score: null });
+  const g = (id: string, away: ReturnType<typeof team>, home: ReturnType<typeof team>): Game => ({
+    id, league: "NBA", startTime: "", status: "scheduled", statusLabel: "", away, home, coverage: "play_by_play",
+  });
+  const LAL = team("lal", "Los Angeles Lakers", "LAL");
+  const MIL = team("mil", "Milwaukee Bucks", "MIL");
+  const GSW = team("gsw", "Golden State Warriors", "GSW");
+  const MIA = team("mia", "Miami Heat", "MIA");
+  const SAS = team("sas", "San Antonio Spurs", "SAS");
+  const CHI = team("chi", "Chicago Bulls", "CHI");
+
+  it("'LA Lakers vs MIL Bucks' matches the real game", () => {
+    const r = matchLeg(leg("LA Lakers", "MIL Bucks", "NBA"), [g("a", MIL, LAL), g("b", GSW, MIA)]);
+    expect(r).toMatchObject({ gameId: "a", pickTeamId: "lal", confidence: "high" });
+  });
+
+  it("teams the alias table has never seen still match by nickname", () => {
+    const r = matchLeg(leg("SA Spurs", "CHI Bulls", "NBA"), [g("c", CHI, SAS)]);
+    expect(r).toMatchObject({ gameId: "c", pickTeamId: "sas", confidence: "high" });
+  });
+
+  it("says the matchup isn't on the schedule instead of 'more than one game fits'", () => {
+    const r = matchLeg(leg("LA Lakers", "MIL Bucks", "NBA"), [g("x", GSW, LAL), g("y", MIA, MIL)]);
+    expect(r.gameId).toBeNull();
+    expect(r.note).toMatch(/isn't on today's schedule/);
+    expect(r.candidates).toEqual(expect.arrayContaining(["x", "y"]));
   });
 });

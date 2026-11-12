@@ -84,11 +84,21 @@ function keysFor(team: TeamScore, league: League): string[] {
  * 1 exact (after cleanup) · 0.85 the text is a cut-off start of the name · 0.75 the name plus
  * extra words (e.g. a mascot) · up to 0.5 for partial word overlap.
  */
+const PRO_LEAGUES: League[] = ["NFL", "NBA"];
+
 export function nameScore(text: string, team: TeamScore, league: League): number {
   const q = normalizeName(text);
   if (!q) return 0;
   let best = 0;
   const qWords = new Set(q.split(" "));
+  // Pro team nicknames are unique within a league, so "LA Lakers", "MIL Bucks", "GS Warriors"
+  // or just "Bucks" identify the team (the city part is often abbreviated on slips).
+  if (PRO_LEAGUES.includes(league)) {
+    const nick = normalizeName(team.name).split(" ").pop()!;
+    const words = q.split(" ");
+    if (q === nick) return 1;
+    if (words.length <= 3 && words[words.length - 1] === nick) best = 0.9;
+  }
   for (const k of keysFor(team, league)) {
     if (q === k) return 1;
     if (q.length >= 4 && k.startsWith(q)) best = Math.max(best, 0.85);
@@ -186,6 +196,13 @@ export function matchLeg(leg: LegToMatch, games: Game[]): MatchResult {
   if (!scored.length) {
     if (leg.betType === "prop") return none("Pick the game for this player prop.");
     return none(league ? "Couldn't find this game on today's schedule." : "Couldn't find this game. Check the league and team names.");
+  }
+
+  // The slip names both teams, but no game on the schedule has both of them.
+  const bothNamed =
+    (leg.betType === "moneyline" || leg.betType === "spread") && !!leg.opponent && !looksTruncated(leg.opponent);
+  if (bothNamed && !scored.some((s) => s.pickScore >= STRONG && s.oppScore >= 0.5)) {
+    return none(`${leg.pick} vs ${leg.opponent} isn't on today's schedule. Pick the game, or check the date.`);
   }
 
   const top = scored[0];

@@ -15,6 +15,14 @@ Return one entry per leg, in the order shown:
 
 source: the app name if it is visible (e.g. "Kalshi"), else "".
 
+Prediction-market phrasing (e.g. Kalshi), convert it like this:
+- A game header such as "LA Lakers vs MIL Bucks" names both teams; use it for pick and opponent.
+- "X to win" -> moneyline, pick X.
+- "Yes · X win by over N points" -> spread, pick X, line "-N".
+- "No · X win by over N points" -> spread, pick the OTHER team in that game, line "+N". This is a straight conversion: don't flag it just for being converted. But if N is a whole number (e.g. 10), set needs_review true and say the market settles differently from a spread on an exact margin.
+- "Over N points" / "Under N points" under a game -> total, pick "Over"/"Under", line "oN"/"uN", opponent = that game's header.
+- A leg with no price printed next to it gets price "".
+
 Rules:
 - Several images may be consecutive, overlapping pieces of one long slip. A leg that appears in two pieces is still one leg: list it once.
 - Ignore totals, payouts, stake, promos and account details; list only the legs.
