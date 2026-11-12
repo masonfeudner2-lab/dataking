@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { LegEditor } from "@/components/LegEditor";
 import { load, readBoardSlip, save, writeBoardSlip } from "@/lib/client/hooks";
 import { MAX_PIECES, prepareImages } from "@/lib/client/prepareImages";
-import { draftsFromExtraction, draftsFromSlip, newBlankDraft, slipFromDrafts, type DraftLeg } from "@/lib/extract/drafts";
+import { draftsFromExtraction, draftsFromSlip, findDuplicates, newBlankDraft, slipFromDrafts, type DraftLeg } from "@/lib/extract/drafts";
 import { SAMPLE_EXTRACTION } from "@/lib/extract/sample";
 import type { ExtractResponse } from "@/lib/extract/schema";
 import { todayPT } from "@/lib/format";
@@ -113,8 +113,7 @@ export default function ReadSlipPage() {
   }
 
   function build() {
-    const flagged = drafts.filter((d) => d.flags.length && d.pick.trim()).length;
-    if (flagged && !warnBuild) {
+    if (flaggedCount && !warnBuild) {
       setWarnBuild(true);
       return;
     }
@@ -128,7 +127,8 @@ export default function ReadSlipPage() {
     setWarnBuild(false);
     setDrafts((ds) => ds.map((d) => (d.id === id ? { ...d, ...patch } : d)));
   };
-  const flaggedCount = drafts.filter((d) => d.flags.length).length;
+  const duplicates = findDuplicates(drafts);
+  const flaggedCount = drafts.filter((d) => d.flags.length || duplicates.has(d.id)).length;
 
   return (
     <main>
@@ -255,6 +255,7 @@ export default function ReadSlipPage() {
                 index={i}
                 games={games}
                 byId={byId}
+                duplicateOf={duplicates.get(d.id)}
                 onChange={(p) => update(d.id, p)}
                 onRemove={() => setDrafts((ds) => ds.filter((x) => x.id !== d.id))}
               />

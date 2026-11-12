@@ -1,7 +1,7 @@
 "use client";
 
 import { legState } from "@/lib/grading";
-import { gameWhen, legChip, legLabel } from "@/lib/format";
+import { gameWhen, legChip, legLabel, pickName } from "@/lib/format";
 import { usePlays } from "@/lib/client/hooks";
 import { LEAGUE_LABEL, type Game, type League, type Leg, type LegResult } from "@/lib/types";
 import { Sheet } from "./Sheet";
@@ -50,9 +50,10 @@ export function GameDetail({ game, legs, sim, demo, setManual, onClose }: Props)
               return (
                 <li key={l.id}>
                   <div className="leg-head">
-                    <b>{legLabel(l)}</b>
+                    <b>{legLabel(l, game)}</b>
                     <span className={`chip ${chip.tone}`}>{chip.text}</span>
                   </div>
+                  {pickName(l, game) !== l.pick && <p className="muted small">On your slip: {l.pick}</p>}
                   {l.price && <p className="muted small">Price on your slip: {l.price}</p>}
                   {l.betType === "prop" && (
                     <p className="muted small">Props are graded by you for now. Automatic prop grading arrives with player stats.</p>

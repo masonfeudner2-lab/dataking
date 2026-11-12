@@ -1,4 +1,4 @@
-import { looksTruncated, matchLeg, toLeague, type MatchConfidence } from "@/lib/matching/match";
+import { looksTruncated, matchLeg, normalizeName, toLeague, type MatchConfidence } from "@/lib/matching/match";
 import type { Game, Leg, Slip } from "@/lib/types";
 import type { Extraction } from "./schema";
 
@@ -48,6 +48,27 @@ export function draftsFromExtraction(ex: Extraction, games: Game[]): DraftLeg[] 
 /** Re-open a saved slip on the confirm screen ("Edit legs"). */
 export function draftsFromSlip(slip: Slip): DraftLeg[] {
   return slip.legs.map((l) => ({ ...l, flags: [], note: "", match: l.gameId ? "high" : "none", candidates: [] }));
+}
+
+/**
+ * Legs that repeat an earlier leg: same game, same bet type, same side, same line.
+ * Returns legId -> number of the earlier leg (1-based), for "Same as leg 3".
+ * Real slips can't hold the same leg twice, so this usually means a misread or a wrong game pick.
+ */
+export function findDuplicates(drafts: DraftLeg[]): Map<string, number> {
+  const seen = new Map<string, number>();
+  const dups = new Map<string, number>();
+  drafts.forEach((d, i) => {
+    if (!d.gameId || !d.pick.trim()) return;
+    const side = d.pickTeamId ?? normalizeName(d.pick);
+    // Moneylines have no line; ignore any leftover number from before the bet type was changed.
+    const line = d.betType === "moneyline" ? "" : d.line.replace(/\s+/g, "").toLowerCase();
+    const key = [d.gameId, d.betType, side, line].join("|");
+    const first = seen.get(key);
+    if (first !== undefined) dups.set(d.id, first + 1);
+    else seen.set(key, i);
+  });
+  return dups;
 }
 
 export function newBlankDraft(): DraftLeg {

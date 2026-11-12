@@ -67,7 +67,7 @@ export function GameTile({ id, game, legs, onOpen }: Props) {
               const chip = legChip(states[i]);
               return (
                 <li key={l.id}>
-                  <span className="leg-name">{legLabel(l)}</span>
+                  <span className="leg-name">{legLabel(l, game)}</span>
                   <span className={`chip ${chip.tone}`}>{chip.text}</span>
                 </li>
               );

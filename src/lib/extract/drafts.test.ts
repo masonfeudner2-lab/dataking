@@ -41,3 +41,36 @@ describe("drafts from a slip read", async () => {
     expect(Object.keys(slip.legs[0])).not.toContain("flags");
   });
 });
+
+describe("duplicate legs", async () => {
+  const { findDuplicates } = await import("./drafts");
+  const games = await new MockProvider().listGames("2026-11-07", { simMinute: 0 });
+  const drafts = draftsFromExtraction(SAMPLE_EXTRACTION, games);
+
+  it("the sample has none", () => {
+    expect(findDuplicates(drafts).size).toBe(0);
+  });
+
+  it("flags a leg that repeats an earlier one, even if the slip spelled it differently", () => {
+    const pvA = drafts.find((d) => d.pick === "Prairie View A&M")!;
+    const copy = { ...pvA, id: "copy", pick: "Prairie View" };
+    expect(findDuplicates([...drafts, copy]).get("copy")).toBe(1);
+  });
+
+  it("same team, different bet type is not a duplicate", () => {
+    const pvA = drafts.find((d) => d.pick === "Prairie View A&M")!;
+    const spread = { ...pvA, id: "sp", betType: "spread" as const, line: "+3.5" };
+    expect(findDuplicates([...drafts, spread]).has("sp")).toBe(false);
+  });
+});
+
+describe("duplicate legs after editing", async () => {
+  const { findDuplicates } = await import("./drafts");
+  const games = await new MockProvider().listGames("2026-11-07", { simMinute: 0 });
+  const drafts = draftsFromExtraction(SAMPLE_EXTRACTION, games);
+  it("a spread switched to 'to win' is compared without its old line", () => {
+    const pvA = drafts.find((d) => d.pick === "Prairie View A&M")!;
+    const edited = { ...pvA, id: "edited", pick: "Prairie View", line: "-3.5" };
+    expect(findDuplicates([...drafts, edited]).get("edited")).toBe(1);
+  });
+});

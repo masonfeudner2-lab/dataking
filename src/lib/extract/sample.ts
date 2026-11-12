@@ -13,7 +13,7 @@ export const SAMPLE_EXTRACTION: Extraction = {
     { pick: "Over", opponent: "BUF/KC", league: "NFL", bet_type: "total", line: "o47.5", price: "-110", needs_review: false, review_reason: "" },
     { pick: "NDSU", opponent: "S. Dakota St.", league: "FCS", bet_type: "moneyline", line: "", price: "52%", needs_review: false, review_reason: "" },
     { pick: "Celtics", opponent: "Knicks", league: "NBA", bet_type: "spread", line: "-4.5", price: "-110", needs_review: false, review_reason: "" },
-    { pick: "Prairie View", opponent: null, league: "", bet_type: "moneyline", line: "", price: "38%", needs_review: true, review_reason: "League and opponent aren't shown for this leg." },
+    { pick: "Prairie View", opponent: null, league: "", bet_type: "spread", line: "-3.5", price: "-110", needs_review: true, review_reason: "League and opponent aren't shown for this leg." },
     { pick: "Montana St...", opponent: null, league: "NCAA Football", bet_type: "moneyline", line: "", price: "61%", needs_review: true, review_reason: "Team name is cut off on the slip." },
     { pick: "Jalen Hurts", opponent: null, league: "NFL", bet_type: "prop", line: "40+ rush yds", price: "+120", needs_review: false, review_reason: "" },
     { pick: "Duke", opponent: "Kansas", league: "College Basketball", bet_type: "moneyline", line: "", price: "58%", needs_review: false, review_reason: "" },

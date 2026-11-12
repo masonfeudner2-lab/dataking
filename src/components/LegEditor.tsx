@@ -10,6 +10,8 @@ interface Props {
   index: number;
   games: Game[];
   byId: Map<string, Game>;
+  /** Set when this leg repeats an earlier one (1-based number of that leg). */
+  duplicateOf?: number;
   onChange: (patch: Partial<DraftLeg>) => void;
   onRemove: () => void;
 }
@@ -24,10 +26,10 @@ const BET_TYPES: { value: BetType; label: string }[] = [
 
 const gameLabel = (g: Game) => `${g.away.name} at ${g.home.name} · ${gameWhen(g)}`;
 
-export function LegEditor({ leg, index, games, byId, onChange, onRemove }: Props) {
+export function LegEditor({ leg, index, games, byId, duplicateOf, onChange, onRemove }: Props) {
   const league = toLeague(leg.league);
   const game = leg.gameId ? byId.get(leg.gameId) : undefined;
-  const flagged = leg.flags.length > 0;
+  const flagged = leg.flags.length > 0 || duplicateOf !== undefined;
   const needsSide = (leg.betType === "moneyline" || leg.betType === "spread") && game;
   const candidateGames = leg.candidates.map((id) => byId.get(id)).filter((g): g is Game => !!g);
   const leagueGames = games.filter((g) => !league || g.league === league);
@@ -148,13 +150,16 @@ export function LegEditor({ leg, index, games, byId, onChange, onRemove }: Props
       {flagged && (
         <div className="why">
           <ul>
+            {duplicateOf !== undefined && <li>Same as leg {duplicateOf}. Remove one, or pick a different game.</li>}
             {leg.flags.map((f, i) => (
               <li key={i}>{f}</li>
             ))}
           </ul>
-          <button type="button" className="btn ghost small-btn" onClick={() => onChange({ flags: [] })}>
-            Looks right
-          </button>
+          {leg.flags.length > 0 && (
+            <button type="button" className="btn ghost small-btn" onClick={() => onChange({ flags: [] })}>
+              Looks right
+            </button>
+          )}
         </div>
       )}
       {!flagged && leg.note && <p className="muted small">{leg.note}</p>}

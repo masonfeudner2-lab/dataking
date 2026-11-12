@@ -30,6 +30,7 @@ A running log in plain language. Newest entries at the bottom of each section.
 | 22 | 2026-11-06 | **Team aliases live in one shared table** (`src/lib/matching/aliases.ts`), separate from any data feed. Common short forms (St., Miss., N./S., Okla.) and accents/ʻokina are handled automatically. | Works with any provider. When a real slip uses a new spelling, add one line. |
 | 23 | 2026-11-06 | **Optional passcode (`SLIP_READER_PASSCODE`)** for slip reading. | A public link means anyone could spend your Claude credit. Accounts (Phase C) will replace this. |
 | 24 | 2026-11-06 | **Hit-rate providers (recommendation): CFBD/CBBD for college, BALLDONTLIE for NBA/NFL**, starting NBA-only on the cheapest plan. | Cheapest options whose terms appear to allow commercial use. Must confirm in writing (Q4). |
+| 25 | 2026-11-12 | **Once a leg is matched, the board shows the schedule's team name** ("Prairie View A&M"), not the slip's shorthand ("Prairie View"). The slip's wording is still shown in the game details ("On your slip: …"). **The confirm screen flags duplicate legs** (same game, bet type, team and line). | Found in your Vercel test: a shorthand label looked like a different team, and a leg put on the wrong game duplicated another leg without warning. |
 
 ## Open questions
 

@@ -1,13 +1,22 @@
 import type { LegState } from "@/lib/grading";
 import type { Game, Leg } from "@/lib/types";
 
+/**
+ * The team name to show for a leg: the schedule's official name once the leg is matched
+ * ("Prairie View A&M"), otherwise what the slip said ("Prairie View").
+ */
+export function pickName(leg: Leg, game?: Game): string {
+  const team = game && leg.pickTeamId ? [game.away, game.home].find((t) => t.teamId === leg.pickTeamId) : undefined;
+  return team?.name ?? leg.pick;
+}
+
 /** "Southern to win", "Texas Tech -6.5", "Over 47.5", "Jalen Hurts 40+ rush yds" */
-export function legLabel(leg: Leg): string {
+export function legLabel(leg: Leg, game?: Game): string {
   switch (leg.betType) {
     case "moneyline":
-      return `${leg.pick || "Pick"} to win`;
+      return `${pickName(leg, game) || "Pick"} to win`;
     case "spread":
-      return `${leg.pick} ${leg.line}`.trim();
+      return `${pickName(leg, game)} ${leg.line}`.trim();
     case "total": {
       const n = leg.line.replace(/^(o|u|over|under)\s*/i, "");
       const side = /^u/i.test(leg.line) || /^under/i.test(leg.pick) ? "Under" : "Over";
