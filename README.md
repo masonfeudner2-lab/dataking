@@ -13,7 +13,7 @@ The repo works in phases. See [DECISIONS.md](DECISIONS.md) for every decision ma
 | B | Slip screenshot upload → AI reads legs → confirm/edit screen → team matching | **Done** (needs your Claude API key to read real screenshots) |
 | C | Accounts, saved slips, your record and stats | Next |
 | D | Real score feeds (CollegeFootballData + a multi-sport API) | |
-| E | Player hit-rate tracker (public, no login) | |
+| E | Player hit-rate tracker: `/props` (player ladders, browse, watchlist, daily summary) | **In progress**: math ported and verified; screens run on your Sheet's Nov 18 snapshot. Automatic updates next. |
 | F | Prop legs linked to hit rates, automatic prop grading | |
 
 `prototype/slip-reader.html` is the original single-file prototype, kept for reference.
@@ -61,6 +61,19 @@ This gives you a link you can text to friends. It takes about 5 minutes and you 
 3. You get a link like `dataking-yourname.vercel.app`. Every time new code is pushed, Vercel rebuilds it automatically, and each branch gets its own preview link.
 
 On your phone, open the link and use **Share → Add to Home Screen** to get an app icon.
+
+## Phase E (hit rates): what to test
+
+Open `/props` (or tap **Hit rates** on the board). It runs on your Sheet's Nov 18 snapshot for now, so the numbers don't change yet.
+
+1. **Search** a player (try "Brunson" or "Henry"). His page shows the full ladder: L5 / L10 / Season / Home / Away and streak, colored by hit rate.
+2. **Tap a line** (e.g. 25+). Hits and misses for that line light up in the game log. Tap **Watch this line** to pin it.
+3. The **game log** shows every game: DNP / out / pending rows say why and are marked "not counted". ⚠ = limited minutes or snaps (counted, but flagged). A red **?** = a stat that failed a cross-check (blank on purpose).
+4. **Browse**: e.g. NBA · Points · 20+ · L10 · at least 80%. Every player hitting it, best first; your watched players on top.
+5. **Daily summary**: the same sections as the Sheet's Daily Summary.
+6. **My props** (on the Players tab): your pinned players and lines. For now they're saved on this phone only (a cookie); they move to the database in the next step.
+
+The data rules live in `src/lib/props/` and are checked by `npm test`, which proves the port matches your Sheet row for row (`reproduce.test.ts`) and tests each data rule (`rules.test.ts`).
 
 ## Phase A: what to test
 

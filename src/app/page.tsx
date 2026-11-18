@@ -55,6 +55,9 @@ export default function BoardPage() {
       <header className="top">
         <h1>Your board</h1>
         <div className="top-actions">
+          <Link className="btn ghost" href="/props">
+            Hit rates
+          </Link>
           <Link className="btn" href="/read">
             Read a slip
           </Link>
