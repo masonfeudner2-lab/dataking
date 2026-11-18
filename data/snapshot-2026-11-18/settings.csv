@@ -1,0 +1,10 @@
+sport,stat,label,"lines (at or above, comma separated)",applies to,Unnamed: 5,setting,value
+NBA,PTS,Points,"5,10,15,20,25,30,35,40",all,,NBA: min avg minutes to track,5
+NBA,AST,Assists,"2,4,6,8,10,12",all,,NFL: min avg targets (receiving ladders),1
+NBA,REB,Rebounds,"2,4,6,8,10,12,14",all,,NFL: min avg carries (rushing ladder),1
+NBA,3PM,3-Pointers Made,"1,2,3,4,5,6",all,,NFL: QB needs a game with at least this many pass attempts,10
+NFL,PASS_YDS,Passing Yards,"125,150,175,200,225,250,275,300,325,350",QB only,,Limited flag: % below player avg minutes/snap share,35
+NFL,PASS_TD,Passing TDs,"1,2,3,4",QB only,,Trend: L5 vs season gap (percentage points),40
+NFL,REC_YDS,Receiving Yards,"10,15,20,30,40,50,60,70,80,90,100,110,120,130,140,150",receivers,,Trend: min season games,6
+NFL,REC,Receptions,"2,3,4,5,6,7,8,9,10",receivers,,Streak flag: min length,5
+NFL,RUSH_YDS,Rushing Yards,"10,15,20,30,40,50,60,70,80,90,100,110,120,130,140,150",rushers,,Daily Summary: keep this many rows,3000
