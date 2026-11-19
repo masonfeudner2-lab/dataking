@@ -1,0 +1,56 @@
+name: Update hit-rate data
+# NBA: every day ~5am PT (last night's FINAL games). NFL: Tuesday ~10am PT + Wednesday re-run
+# (stat corrections, nflverse + snap counts). Times are UTC: 13:10 = 5:10am PST / 6:10am PDT.
+on:
+  schedule:
+    - cron: "10 13 * * *"     # NBA daily
+    - cron: "10 18 * * 2,3"   # NFL Tue + Wed
+  workflow_dispatch:
+    inputs:
+      sport:
+        description: "nba, nfl or both"
+        default: both
+  push:
+    branches: [claude/kind-ptolemy-qt65jy]
+    paths: [".github/workflows/update-data.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: Which sport
+        id: which
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "sport=${{ inputs.sport }}" >> "$GITHUB_OUTPUT";
+          elif [ "${{ github.event.schedule }}" = "10 13 * * *" ]; then echo "sport=nba" >> "$GITHUB_OUTPUT";
+          elif [ "${{ github.event.schedule }}" = "10 18 * * 2,3" ]; then echo "sport=nfl" >> "$GITHUB_OUTPUT";
+          else echo "sport=both" >> "$GITHUB_OUTPUT"; fi
+      - name: Update
+        id: update
+        continue-on-error: true   # a partial run still saves what it got; the failure stays visible below
+        run: npx tsx scripts/update.ts ${{ steps.which.outputs.sport }}
+      - name: Save data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/live
+          if git diff --cached --quiet; then echo "No data changes."; exit 0; fi
+          git commit -m "Data: ${{ steps.which.outputs.sport }} update $(TZ=America/Los_Angeles date '+%Y-%m-%d %H:%M PT')"
+          for i in 1 2 3; do git pull --rebase -q && git push -q && exit 0; sleep 5; done; exit 1
+      - name: Report a failed update
+        if: steps.update.outcome == 'failure'
+        run: |
+          echo "::error::The update had problems (see the Update step). Whatever loaded was saved; the rest retries next run."
+          exit 1

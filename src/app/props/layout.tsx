@@ -19,6 +19,7 @@ export default async function PropsLayout({ children }: { children: React.ReactN
         {(["NBA", "NFL"] as const).map((s) => (
           <span key={s} className="fresh-item">
             <b>{s}</b> updated {fmtPt(ds.meta[s].lastUpdatedUtc)} · games thru {fmtDay(ds.meta[s].lastGameDate)}
+            {ds.meta[s].lastRunProblem && <span className="badge warn" title={ds.meta[s].lastRunProblem!}>last update incomplete, retrying</span>}
             {ds.meta[s].unverifiedRows > 0 && (
               <Link href="/props/summary#unverified" className="badge warn">{ds.meta[s].unverifiedRows} unverified</Link>
             )}
