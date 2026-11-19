@@ -56,11 +56,15 @@ describe("NBA update job", () => {
     expect(store.readState().NBA.scanFrom).toBe("2026-10-25");
     expect(store.readSummaryText()).toContain("NBA update");
 
-    // next day: nothing new, nothing older than 2 days re-fetched
-    const net2 = fakeNet(games);
-    const r2 = await updateNba(store, cfg, [], new Date("2026-10-29T13:00:00Z"), net2);
-    expect(r2.info.gamesProcessed).toBe(0);
-    expect(net2.calls[0]).toContain("dates=20261025");
+    // 2 days later: the last 14 days are re-checked for ESPN corrections
+    const r2 = await updateNba(store, cfg, [], new Date("2026-10-29T13:00:00Z"), fakeNet(games));
+    expect(r2.info.gamesProcessed).toBe(3);
+    // a week after the last full refresh: the whole season is re-checked, even games older than 14 days
+    const r3 = await updateNba(store, cfg, [], new Date("2026-11-12T13:00:00Z"), fakeNet(games));
+    expect(r3.info.gamesProcessed).toBe(3);
+    // 3 days after that full refresh: games older than 14 days aren't re-fetched
+    const r4 = await updateNba(store, cfg, [], new Date("2026-11-15T13:00:00Z"), fakeNet(games));
+    expect(r4.info.gamesProcessed).toBe(0);
   });
 
   it("a missing box score is skipped, flagged and retried; existing rows are kept", async () => {
@@ -83,7 +87,7 @@ describe("NBA update job", () => {
     const star = store.readNbaLogs().find((x) => x.player === "Home Star")!;
     expect(star.reb).toBeNull();
     expect(star.check_status).toBe("FAILED – team total mismatch");
-    // 5 days later (outside the 2-day refresh) it's still re-fetched because it failed
+    // re-fetched: ESPN's corrected box score now adds up
     const net = fakeNet([nbaGame("g1", "2026-10-21", 110, 100)]);
     const r = await updateNba(store, cfg, [], new Date("2026-10-26T13:00:00Z"), net);
     expect(r.info.freshIds).toEqual(["g1"]);

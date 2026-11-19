@@ -39,9 +39,14 @@ function saveSummary(store: LiveStore, sport: Sport, items: SummaryItem[], now: 
   store.appendSummary(items.map(([section, item, detail]) => ({ run_time_pt: t, sport, section, item, detail })));
 }
 
-/** Re-fetch FINAL games this recent every run, to pick up ESPN's late stat corrections. */
-const NBA_REFRESH_DAYS = 2;
-const NFL_REFRESH_DAYS = 9;
+/**
+ * ESPN corrects box scores days after games (rebounds/assists moved between teammates), and the Sheet never
+ * re-fetched a game that had passed its checks. So: re-fetch every FINAL game from the last 14 days on every
+ * run, and the whole season once a week. A failed fetch never overwrites rows we already have.
+ */
+const REFRESH_DAYS = 14;
+const FULL_REFRESH_EVERY_DAYS = 7;
+const fullRefreshDue = (last: string | undefined, now: Date) => !last || (now.getTime() - new Date(last).getTime()) / 86400000 >= FULL_REFRESH_EVERY_DAYS - 0.1;
 
 // ================================================================= NBA
 export async function updateNba(store: LiveStore, cfg: Settings, watch: WatchEntry[], now = new Date(), net: Net = realNet): Promise<RunResult> {
@@ -50,12 +55,15 @@ export async function updateNba(store: LiveStore, cfg: Settings, watch: WatchEnt
   const st = state.NBA;
   const notes: SummaryItem[] = [];
   const existing = store.readNbaLogs().filter((r) => r.status !== "NOT_IN_BOX");
+  const full = fullRefreshDue(st.lastFullRefresh, now);
   const byGame: Record<string, NbaLogRow[]> = {};
   for (const r of existing) (byGame[r.game_id] ||= []).push(r);
 
   // 1) which dates to scan
   const today = ymdInTz(now, ET);
-  let from = st.scanFrom || SEASONS.NBA.scanFrom;
+  let from = full ? SEASONS.NBA.scanFrom : st.scanFrom || SEASONS.NBA.scanFrom;
+  const refreshFrom = new Date(now.getTime() - REFRESH_DAYS * 86400000).toISOString().slice(0, 10);
+  if (refreshFrom < from) from = refreshFrom < SEASONS.NBA.scanFrom ? SEASONS.NBA.scanFrom : refreshFrom;
   const missing = (st.missing || []).filter((d) => daysAgo(d, now) <= RETRY_DAYS);
   for (const r of existing) if (!isOk(r.check_status) && daysAgo(r.game_date, now) <= RETRY_DAYS && r.game_date < from) from = r.game_date;
   for (const d of missing) if (d < from) from = d;
@@ -78,7 +86,7 @@ export async function updateNba(store: LiveStore, cfg: Settings, watch: WatchEnt
       const prior = byGame[ev.id];
       const date = ymdInTz(new Date(ev.date), ET);
       const needsRetry = prior && prior.some((x) => !isOk(x.check_status)) && daysAgo(prior[0].game_date, now) <= RETRY_DAYS;
-      const refresh = daysAgo(date, now) <= NBA_REFRESH_DAYS + 0.5;
+      const refresh = full || daysAgo(date, now) <= REFRESH_DAYS;
       if (prior && !needsRetry && !refresh) continue;
       const c: Record<string, any> = {};
       for (const x of comp?.competitors || []) c[x.homeAway] = { id: String(x.team.id), abbr: x.team.abbreviation, score: num(x.score) };
@@ -110,6 +118,7 @@ export async function updateNba(store: LiveStore, cfg: Settings, watch: WatchEnt
   }
   st.missing = [...new Set(stillMissing)];
   if (!sbFail.length) st.backfillDone = true;
+  if (full && !sbFail.length) st.lastFullRefresh = now.toISOString();
   if (sbFail.length) notes.unshift(["UNVERIFIED", `${sbFail.length} of ${dates.length} ESPN scoreboard days did not load`, sbFail.slice(0, 5).join(", ") + (sbFail.length > 5 ? ", …" : "") + " — will retry next run"]);
 
   // 4) rebuild + save
@@ -149,6 +158,7 @@ export async function updateNfl(store: LiveStore, cfg: Settings, watch: WatchEnt
   const byGame: Record<string, NflLogRow[]> = {};
   for (const r of raw) (byGame[r.game_id] ||= []).push(r);
   // retry decisions use the verified log's check status
+  const full = fullRefreshDue(st.lastFullRefresh, now);
   const badGames = new Set(store.readNflLogs().filter((r) => r.source === "ESPN" && !isOk(r.check_status) && daysAgo(r.game_date, now) <= RETRY_DAYS).map((r) => r.game_id));
 
   const nv = await loadNflverse(yr, net, notes);
@@ -166,7 +176,7 @@ export async function updateNfl(store: LiveStore, cfg: Settings, watch: WatchEnt
       if (!s || !s.completed || s.name !== "STATUS_FINAL") continue;
       const date = ymdInTz(new Date(ev.date), ET);
       const prior = byGame[ev.id];
-      const retry = badGames.has(String(ev.id)) || daysAgo(date, now) <= NFL_REFRESH_DAYS;
+      const retry = full || badGames.has(String(ev.id)) || daysAgo(date, now) <= REFRESH_DAYS;
       if (prior && !retry) continue;
       const c: Record<string, any> = {};
       for (const x of ev.competitions?.[0]?.competitors || []) c[x.homeAway] = { id: String(x.team.id), abbr: x.team.abbreviation, score: num(x.score) };
@@ -185,6 +195,7 @@ export async function updateNfl(store: LiveStore, cfg: Settings, watch: WatchEnt
     byGame[g.id] = rows; fresh.push(g.id);
   });
   if (!fail.length) st.backfillDone = true;
+  if (full && !fail.length && fresh.length === games.length) st.lastFullRefresh = now.toISOString();
 
   // raw ESPN rows are stored untouched; verification + inference is re-derived every run
   const rawAll = Object.values(byGame).flat().sort(logOrder);
@@ -193,8 +204,8 @@ export async function updateNfl(store: LiveStore, cfg: Settings, watch: WatchEnt
   verifyNfl(espn, nv);
   const P = nflPlayerMeta(espn);
   const inferred = inferNfl(espn, nv, P, now);
+  const res = deriveNfl(espn, inferred, P, cfg, watch); // also sets limited_snaps on these rows
   store.writeNflLogs(espn.concat(inferred).sort(logOrder));
-  const res = deriveNfl(espn, inferred, P, cfg, watch);
   const items = buildSummary("NFL", res.P, res.hit, res.logRows, cfg, fresh, watch.filter((w) => w.sport === "NFL"), now);
   const msg = `${fresh.length} games processed; nflverse stats ${nv.statsOk ? "loaded" : "NOT loaded"}, snaps ${nv.snapsOk ? "loaded" : "NOT loaded"}; ${Math.round((Date.now() - t0) / 1000)}s`;
   const info: RunInfo = { at: now.toISOString(), ok: !fail.length && nv.statsOk && nv.snapsOk, gamesProcessed: fresh.length, freshIds: fresh, message: msg };

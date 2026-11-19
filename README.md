@@ -75,6 +75,23 @@ Open `/props` (or tap **Hit rates** on the board). It runs on your Sheet's Nov 1
 
 The data rules live in `src/lib/props/` and are checked by `npm test`, which proves the port matches your Sheet row for row (`reproduce.test.ts`) and tests each data rule (`rules.test.ts`).
 
+## Hit rates: how the automatic updates work
+
+Nothing runs on your computer. GitHub runs the job on its servers (`.github/workflows/update-data.yml`):
+
+| When (Pacific time) | What |
+|---|---|
+| Every day ~5:10am (6:10am in summer) | NBA: last night's FINAL games, plus re-checks of the last 2 days and anything unverified from the last 14 days |
+| Tuesday + Wednesday ~10:10am (11:10am in summer) | NFL: the week's FINAL games, re-checks the last 9 days, cross-checks every player against nflverse + snap counts |
+
+Each run saves the data in `data/live/` and commits it ("Data: nba update …"). Vercel then rebuilds the site with the new numbers, usually within 2 minutes. If a run has problems (ESPN down, nflverse not posted yet), it saves whatever loaded, the site shows "last update incomplete, retrying", and GitHub emails you.
+
+**Run an update now:** GitHub → your repo → **Actions** → **Update hit-rate data** → **Run workflow** → choose nba, nfl or both → **Run workflow**.
+
+**Change ladders or thresholds:** edit `data/settings.csv` on GitHub (same layout as the Sheet's Settings tab), commit. The site picks it up on the next deploy.
+
+**Compare with the Sheet:** `npx tsx scripts/compare-sheet.ts` compares `data/live` with the Sheet export in `data/snapshot-2026-11-18`, game by game.
+
 ## Phase A: what to test
 
 1. Tap **Load sample slip**. You'll get an 18-leg slip across college football (including FCS), NFL, NBA and college basketball.

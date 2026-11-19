@@ -27,7 +27,7 @@ export interface RunInfo {
   freshIds: string[];
   message: string;
 }
-export interface SportState { scanFrom?: string; missing?: string[]; lastRun?: RunInfo; lastSuccess?: string; backfillDone?: boolean }
+export interface SportState { scanFrom?: string; missing?: string[]; lastRun?: RunInfo; lastSuccess?: string; backfillDone?: boolean; lastFullRefresh?: string }
 export type LiveState = Record<Sport, SportState>;
 
 export class LiveStore {

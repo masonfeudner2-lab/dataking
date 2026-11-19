@@ -1,6 +1,7 @@
 name: Update hit-rate data
 # NBA: every day ~5am PT (last night's FINAL games). NFL: Tuesday ~10am PT + Wednesday re-run
 # (stat corrections, nflverse + snap counts). Times are UTC: 13:10 = 5:10am PST / 6:10am PDT.
+# Every run re-checks the last 14 days for ESPN stat corrections; the whole season once a week.
 on:
   schedule:
     - cron: "10 13 * * *"     # NBA daily
