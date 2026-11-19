@@ -4,7 +4,7 @@
     "missing": [],
     "backfillDone": true,
     "lastRun": {
-      "at": "2026-11-19T08:11:30.149Z",
+      "at": "2026-11-19T08:13:29.338Z",
       "ok": true,
       "gamesProcessed": 222,
       "freshIds": [
@@ -233,12 +233,13 @@
       ],
       "message": "222 games processed, 5915 player rows written, 8s"
     },
-    "lastSuccess": "2026-11-19T08:11:30.149Z"
+    "lastSuccess": "2026-11-19T08:13:29.338Z",
+    "lastFullRefresh": "2026-11-19T08:13:29.338Z"
   },
   "NFL": {
     "backfillDone": true,
     "lastRun": {
-      "at": "2026-11-19T08:11:38.157Z",
+      "at": "2026-11-19T08:13:37.907Z",
       "ok": true,
       "gamesProcessed": 150,
       "freshIds": [
@@ -395,6 +396,7 @@
       ],
       "message": "150 games processed; nflverse stats loaded, snaps loaded; 6s"
     },
-    "lastSuccess": "2026-11-19T08:11:38.157Z"
+    "lastSuccess": "2026-11-19T08:13:37.907Z",
+    "lastFullRefresh": "2026-11-19T08:13:37.907Z"
   }
 }
