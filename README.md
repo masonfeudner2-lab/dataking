@@ -81,8 +81,8 @@ Nothing runs on your computer. GitHub runs the job on its servers (`.github/work
 
 | When (Pacific time) | What |
 |---|---|
-| Every day ~5:10am (6:10am in summer) | NBA: last night's FINAL games, plus re-checks of the last 2 days and anything unverified from the last 14 days |
-| Tuesday + Wednesday ~10:10am (11:10am in summer) | NFL: the week's FINAL games, re-checks the last 9 days, cross-checks every player against nflverse + snap counts |
+| Every day ~3:10am (4:10am in summer); GitHub often starts it up to an hour or so late | NBA: last night's FINAL games, re-checks the last 14 days (and the whole season weekly) for ESPN stat corrections |
+| Tuesday + Wednesday ~10:10am (11:10am in summer) | NFL: the week's FINAL games, re-checks the last 14 days, cross-checks every player against nflverse + snap counts |
 
 Each run saves the data in `data/live/` and commits it ("Data: nba update …"). Vercel then rebuilds the site with the new numbers, usually within 2 minutes. If a run has problems (ESPN down, nflverse not posted yet), it saves whatever loaded, the site shows "last update incomplete, retrying", and GitHub emails you.
 

@@ -1,10 +1,10 @@
 name: Update hit-rate data
-# NBA: every day ~5am PT (last night's FINAL games). NFL: Tuesday ~10am PT + Wednesday re-run
-# (stat corrections, nflverse + snap counts). Times are UTC: 13:10 = 5:10am PST / 6:10am PDT.
+# NBA: every day ~3am PT (last night's FINAL games; early so GitHub's frequent delays still finish before morning). NFL: Tuesday ~10am PT + Wednesday re-run
+# (stat corrections, nflverse + snap counts). Times are UTC: 11:10 = 3:10am PST / 4:10am PDT.
 # Every run re-checks the last 14 days for ESPN stat corrections; the whole season once a week.
 on:
   schedule:
-    - cron: "10 13 * * *"     # NBA daily
+    - cron: "10 11 * * *"     # NBA daily
     - cron: "10 18 * * 2,3"   # NFL Tue + Wed
   workflow_dispatch:
     inputs:
@@ -27,15 +27,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with: { node-version: 22, cache: npm }
       - run: npm ci
       - name: Which sport
         id: which
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "sport=${{ inputs.sport }}" >> "$GITHUB_OUTPUT";
-          elif [ "${{ github.event.schedule }}" = "10 13 * * *" ]; then echo "sport=nba" >> "$GITHUB_OUTPUT";
+          elif [ "${{ github.event.schedule }}" = "10 11 * * *" ]; then echo "sport=nba" >> "$GITHUB_OUTPUT";
           elif [ "${{ github.event.schedule }}" = "10 18 * * 2,3" ]; then echo "sport=nfl" >> "$GITHUB_OUTPUT";
           else echo "sport=both" >> "$GITHUB_OUTPUT"; fi
       - name: Update
