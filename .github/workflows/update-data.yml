@@ -11,9 +11,6 @@ on:
       sport:
         description: "nba, nfl or both"
         default: both
-  push:
-    branches: [claude/kind-ptolemy-qt65jy]
-    paths: [".github/workflows/update-data.yml"]
 
 permissions:
   contents: write
