@@ -1,4 +1,32 @@
 run_time_pt,sport,section,item,detail
+2026-11-20 09:25,NFL,RUN,NFL update,"29 games checked, 1 new or changed; nflverse stats loaded, snaps loaded; 2s"
+2026-11-20 09:25,NFL,LEAGUE TREND,Derrick Henry (BAL) RUSH_YDS 60+,▼ L5 0/5 – 0% vs season 5/10 – 50%
+2026-11-20 09:25,NFL,LEAGUE TREND,Justice Hill (BAL) REC 3+,▲ L5 5/5 – 100% vs season 5/10 – 50%
+2026-11-20 09:25,NFL,LEAGUE TREND,Chris Olave (NO) REC 8+,▼ L5 0/5 – 0% vs season 4/9 – 44%
+2026-11-20 09:25,NFL,LEAGUE TREND,Juwan Johnson (NO) REC_YDS 40+,▼ L5 0/5 – 0% vs season 4/9 – 44%
+2026-11-20 09:25,NFL,LEAGUE TREND,Woody Marks (HOU) RUSH_YDS 50+,▲ L5 5/5 – 100% vs season 5/9 – 56%
+2026-11-20 09:25,NFL,LEAGUE TREND,Ashton Jeanty (LV) RUSH_YDS 30+,▼ L5 0/5 – 0% vs season 4/10 – 40%
+2026-11-20 09:25,NFL,LEAGUE TREND,Brevyn Spann-Ford (DAL) REC_YDS 20+,▲ L5 4/5 – 80% vs season 4/10 – 40%
+2026-11-20 09:25,NFL,LEAGUE TREND,C.J. Stroud (HOU) PASS_TD 3+,▲ L5 4/5 – 80% vs season 4/10 – 40%
+2026-11-20 09:25,NFL,LEAGUE TREND,Denzel Boston (CLE) REC_YDS 40+,▼ L5 1/5 – 20% vs season 6/10 – 60%
+2026-11-20 09:25,NFL,LEAGUE TREND,Matthew Stafford (LAR) PASS_YDS 250+,▼ L5 0/5 – 0% vs season 4/10 – 40%
+2026-11-20 09:25,NFL,DNP / INACTIVE,1 newly out,Woody Marks (HOU) — not counted in hit rates
+2026-11-20 09:25,NFL,UNVERIFIED,PENDING – single source (player not matched in nflverse) — 1 rows,Chris Manhertz 2026-11-08
+2026-11-20 09:25,NBA,RUN,NBA update,"94 games checked, 1 new or changed (27 player rows), 3s"
+2026-11-20 09:25,NBA,LEAGUE TREND,Jarace Walker (IND) REB 6+,▼ L5 0/5 – 0% vs season 8/14 – 57%
+2026-11-20 09:25,NBA,LEAGUE TREND,Morez Johnson Jr. (DAL) PTS 5+,▼ L5 0/5 – 0% vs season 8/14 – 57%
+2026-11-20 09:25,NBA,LEAGUE TREND,Domantas Sabonis (SAC) REB 14+,▼ L5 0/5 – 0% vs season 7/13 – 54%
+2026-11-20 09:25,NBA,LEAGUE TREND,Nolan Traore (BKN) REB 2+,▼ L5 0/5 – 0% vs season 7/13 – 54%
+2026-11-20 09:25,NBA,LEAGUE TREND,Kasparas Jakucionis (MIL) 3PM 2+,▲ L5 4/5 – 80% vs season 4/15 – 27%
+2026-11-20 09:25,NBA,LEAGUE TREND,Onyeka Okongwu (ATL) PTS 15+,▲ L5 5/5 – 100% vs season 7/15 – 47%
+2026-11-20 09:25,NBA,LEAGUE TREND,Tyrese Proctor (CLE) PTS 15+,▲ L5 4/5 – 80% vs season 4/15 – 27%
+2026-11-20 09:25,NBA,LEAGUE TREND,VJ Edgecombe (PHI) AST 4+,▲ L5 5/5 – 100% vs season 7/15 – 47%
+2026-11-20 09:25,NBA,LEAGUE TREND,Isaac Okoro (CHI) AST 2+,▲ L5 5/5 – 100% vs season 7/14 – 50%
+2026-11-20 09:25,NBA,LEAGUE TREND,Obi Toppin (IND) REB 4+,▼ L5 0/5 – 0% vs season 6/12 – 50%
+2026-11-20 09:25,NBA,DNP / INACTIVE,2 newly out,"Cody Williams (MIN), Jordan Clarkson (NY) — not counted in hit rates"
+2026-11-20 09:25,NBA,LIMITED MINUTES,1 tracked players,"Miles McBride 8 min — counted, but flagged"
+2026-11-20 09:25,NBA,UNVERIFIED,FAILED – team total mismatch — 21 rows,"Ayo Dosunmu 2026-11-19 [reb: players sum 40 vs team 39 — blanked, will retry]; Bones Hyland 2026-11-19 [reb: players sum 40 vs team 39 — blanked, will retry]; Jaden McDaniels 2026-11-19 [reb: players sum 40 vs team 39 — blanked, will retry]; Joan Beringer 2026-11-19 [reb: players sum 40 vs team 39 — blanked, will retry]; Jonathan Kuminga 2026-11-19 [reb: players sum 40 vs team 39 — blanked, will retry]; LaMelo Ball 2026-11-19 [reb: players sum 40 vs team 39 — blanked, will retry]; Rudy Gobert 2026-11-19 [reb: players sum 40 vs team 39 — blanked, will retry]; Terrence Shannon Jr. 2026-11-19 [reb: players sum 40 vs team 39 — blanked, will retry]; Trey Lyles 2026-11-19 [reb: players sum 40 vs team 39 — blanked, will retry]; AJ Johnson 2026-11-16 [reb: players sum 58 vs team 57 — blanked, will retry]; Derik Queen 2026-11-16 [reb: players sum 58 vs team 57 — blanked, will retry]; Herbert Jones 2026-11-16 [reb: players sum 58 vs team 57 — blanked, will retry]; Jaron Pierre Jr. 2026-11-16 [reb: players sum 58 vs team 57 — blanked, will retry]; Jeremiah Fears 2026-11-16 [reb: players sum 58 vs team 57 — blanked, will retry]; Jordan Poole 2026-11-16 [reb: players sum 58 vs team 57 — blanked, will retry]; Julian Reese 2026-11-16 [reb: players sum 58 vs team 57 — blanked, will retry]; Karlo Matkovic 2026-11-16 [reb: players sum 58 vs team 57 — blanked, will retry]; Malik Dia 2026-11-16 [reb: players sum 58 vs team 57 — blanked, will retry]; Saddiq Bey 2026-11-16 [reb: players sum 58 vs team 57 — blanked, will retry]; Yves Missi 2026-11-16 [reb: players sum 58 vs team 57 — blanked, will retry]; Zion Williamson 2026-11-16 [reb: players sum 58 vs team 57 — blanked, will retry]"
+2026-11-20 09:25,NBA,VERIFY,401910021 2026-11-19 https://www.basketball-reference.com/boxscores/202611190MIN.html,MIN/PTS/REB/AST/3PM — Ayo Dosunmu 32/6//4/2; Bones Hyland 15/6//1/1; Jaden McDaniels 39/17//1/4; Joan Beringer 13/5//0/0; Jonathan Kuminga 35/23//3/2; LaMelo Ball 35/15//8/3; Rudy Gobert 35/9//0/0; Terrence Shannon Jr. 21/10//3/0; Trey Lyles 16/8//1/2; Andre Drummond 15/4/4/0/0; Jalen Brunson 35/21/2/7/4; Jose Alvarado 13/2/2/1/0; Josh Hart 28/11/6/2/3; Karl-Anthony Towns 33/22/12/4/2; Landry Shamet 30/10/1/2/2; Mikal Bridges 31/8/3/3/2; OG Anunoby 36/15/7/2/1; Tyler Kolek 12/6/3/5/1
 2026-11-20 06:22,NBA,RUN,NBA update,"94 games processed, 2451 player rows written, 4s"
 2026-11-20 06:22,NBA,BACKFILL,78 older games loaded,Per-game notes below cover only the last 3 days.
 2026-11-20 06:22,NBA,LEAGUE TREND,Jarace Walker (IND) REB 6+,▼ L5 0/5 – 0% vs season 8/14 – 57%
