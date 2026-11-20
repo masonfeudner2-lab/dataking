@@ -28,6 +28,16 @@ export const realNet: Net = {
 
 export interface RunResult { items: SummaryItem[]; info: RunInfo }
 
+/**
+ * A re-fetched game only counts as "this run's game" (Daily Summary: what changed, newly out, limited)
+ * if it's new or something in it changed. Otherwise the 14-day re-check would re-report old games every day.
+ */
+function gameSignature(rows: (NbaLogRow | NflLogRow)[], fields: string[]): string {
+  return rows.map((r) => [r.player_id, r.status, ...fields.map((f) => (r as unknown as Record<string, unknown>)[f] ?? "")].join("|")).sort().join("\n");
+}
+const NBA_SIG = ["minutes", "pts", "reb", "ast", "fg3m", "check_status"];
+const NFL_SIG = ["pass_att", "pass_yds", "pass_td", "carries", "rush_yds", "receptions", "targets", "rec_yds"];
+
 const ptStamp = (d: Date) => {
   const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: PT, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
     .formatToParts(d).map((x) => [x.type, x.value]));
@@ -98,7 +108,7 @@ export async function updateNba(store: LiveStore, cfg: Settings, watch: WatchEnt
 
   // 3) box scores
   const stillMissing: string[] = []; const fresh: string[] = [];
-  let added = 0;
+  let added = 0, fetched = 0;
   const boxes = await net.fetchBoxes("NBA", games.map((g) => g.id));
   games.forEach((g, j) => {
     const rows = boxes[j] ? parseNbaBox(boxes[j], g, now) : null;
@@ -108,7 +118,9 @@ export async function updateNba(store: LiveStore, cfg: Settings, watch: WatchEnt
       notes.push(["UNVERIFIED", `${g.away.abbr} @ ${g.home.abbr} ${g.date}`, "Box score not available from ESPN yet; game skipped, will retry."]);
       return;
     }
-    byGame[g.id] = rows; fresh.push(g.id); added += rows.length;
+    const changed = !byGame[g.id] || gameSignature(byGame[g.id], NBA_SIG) !== gameSignature(rows, NBA_SIG);
+    byGame[g.id] = rows; fetched++;
+    if (changed) { fresh.push(g.id); added += rows.length; }
   });
 
   if (lastFullyFinalDate) {
@@ -126,7 +138,7 @@ export async function updateNba(store: LiveStore, cfg: Settings, watch: WatchEnt
   const res = rebuildNba(all, cfg, watch, now);
   store.writeNbaLogs(res.logRows);
   const items = buildSummary("NBA", res.P, res.hit, res.logRows, cfg, fresh, watch.filter((w) => w.sport === "NBA"), now);
-  const msg = `${fresh.length} games processed, ${added} player rows written, ${Math.round((Date.now() - t0) / 1000)}s`;
+  const msg = `${fetched} games checked, ${fresh.length} new or changed (${added} player rows), ${Math.round((Date.now() - t0) / 1000)}s`;
   const info: RunInfo = { at: now.toISOString(), ok: !sbFail.length, gamesProcessed: fresh.length, freshIds: fresh, message: msg };
   st.lastRun = info; if (info.ok) st.lastSuccess = info.at;
   store.writeState(state);
@@ -187,15 +199,17 @@ export async function updateNfl(store: LiveStore, cfg: Settings, watch: WatchEnt
   });
   if (fail.length) notes.unshift(["UNVERIFIED", `${fail.length} ESPN scoreboard weeks did not load`, fail.slice(0, 6).join(", ") + " — will retry next run"]);
 
-  const fresh: string[] = [];
+  const fresh: string[] = []; let fetched = 0;
   const boxes = await net.fetchBoxes("NFL", games.map((g) => g.id));
   games.forEach((g, j) => {
     const rows = boxes[j] ? parseNflBox(boxes[j], g, now) : null;
     if (!rows) { notes.push(["UNVERIFIED", `${g.away.abbr} @ ${g.home.abbr} ${g.date}`, "Box score not available from ESPN yet; will retry."]); return; }
-    byGame[g.id] = rows; fresh.push(g.id);
+    const changed = !byGame[g.id] || gameSignature(byGame[g.id], NFL_SIG) !== gameSignature(rows, NFL_SIG);
+    byGame[g.id] = rows; fetched++;
+    if (changed) fresh.push(g.id);
   });
   if (!fail.length) st.backfillDone = true;
-  if (full && !fail.length && fresh.length === games.length) st.lastFullRefresh = now.toISOString();
+  if (full && !fail.length && fetched === games.length) st.lastFullRefresh = now.toISOString();
 
   // raw ESPN rows are stored untouched; verification + inference is re-derived every run
   const rawAll = Object.values(byGame).flat().sort(logOrder);
@@ -207,7 +221,7 @@ export async function updateNfl(store: LiveStore, cfg: Settings, watch: WatchEnt
   const res = deriveNfl(espn, inferred, P, cfg, watch); // also sets limited_snaps on these rows
   store.writeNflLogs(espn.concat(inferred).sort(logOrder));
   const items = buildSummary("NFL", res.P, res.hit, res.logRows, cfg, fresh, watch.filter((w) => w.sport === "NFL"), now);
-  const msg = `${fresh.length} games processed; nflverse stats ${nv.statsOk ? "loaded" : "NOT loaded"}, snaps ${nv.snapsOk ? "loaded" : "NOT loaded"}; ${Math.round((Date.now() - t0) / 1000)}s`;
+  const msg = `${fetched} games checked, ${fresh.length} new or changed; nflverse stats ${nv.statsOk ? "loaded" : "NOT loaded"}, snaps ${nv.snapsOk ? "loaded" : "NOT loaded"}; ${Math.round((Date.now() - t0) / 1000)}s`;
   const info: RunInfo = { at: now.toISOString(), ok: !fail.length && nv.statsOk && nv.snapsOk, gamesProcessed: fresh.length, freshIds: fresh, message: msg };
   st.lastRun = info; if (info.ok) st.lastSuccess = info.at;
   store.writeState(state);

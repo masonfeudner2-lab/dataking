@@ -56,15 +56,23 @@ describe("NBA update job", () => {
     expect(store.readState().NBA.scanFrom).toBe("2026-10-25");
     expect(store.readSummaryText()).toContain("NBA update");
 
-    // 2 days later: the last 14 days are re-checked for ESPN corrections
+    // 2 days later: the last 14 days are re-checked, but unchanged games aren't "this run's games"
     const r2 = await updateNba(store, cfg, [], new Date("2026-10-29T13:00:00Z"), fakeNet(games));
-    expect(r2.info.gamesProcessed).toBe(3);
+    expect(r2.info.gamesProcessed).toBe(0);
+    expect(r2.info.message).toMatch(/^3 games checked, 0 new or changed/);
+    expect(r2.items.some(([s]) => s === "BACKFILL" || s === "DNP / INACTIVE")).toBe(false);
+    // ESPN corrects a stat: that game counts again
+    const corrected = games.map((g) => structuredClone(g));
+    corrected[2].box.boxscore.players[0].statistics[0].athletes[1].stats[5] = "4"; // Home Bench ast 3 → 4
+    corrected[2].box.boxscore.players[0].statistics[0].totals[5] = "7";
+    const r2b = await updateNba(store, cfg, [], new Date("2026-10-29T14:00:00Z"), fakeNet(corrected));
+    expect(r2b.info.freshIds).toEqual(["g3"]);
     // a week after the last full refresh: the whole season is re-checked, even games older than 14 days
-    const r3 = await updateNba(store, cfg, [], new Date("2026-11-12T13:00:00Z"), fakeNet(games));
-    expect(r3.info.gamesProcessed).toBe(3);
+    const r3 = await updateNba(store, cfg, [], new Date("2026-11-12T13:00:00Z"), fakeNet(corrected));
+    expect(r3.info.message).toMatch(/^3 games checked/);
     // 3 days after that full refresh: games older than 14 days aren't re-fetched
-    const r4 = await updateNba(store, cfg, [], new Date("2026-11-15T13:00:00Z"), fakeNet(games));
-    expect(r4.info.gamesProcessed).toBe(0);
+    const r4 = await updateNba(store, cfg, [], new Date("2026-11-15T13:00:00Z"), fakeNet(corrected));
+    expect(r4.info.message).toMatch(/^0 games checked/);
   });
 
   it("a missing box score is skipped, flagged and retried; existing rows are kept", async () => {
