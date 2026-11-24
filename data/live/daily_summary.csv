@@ -1,4 +1,18 @@
 run_time_pt,sport,section,item,detail
+2026-11-24 11:01,NFL,RUN,NFL update,"27 games checked, 13 new or changed; nflverse stats loaded, snaps loaded; 3s"
+2026-11-24 11:01,NFL,LEAGUE TREND,Juwan Johnson (NO) REC 3+,▼ L5 0/5 – 0% vs season 5/10 – 50%
+2026-11-24 11:01,NFL,LEAGUE TREND,Justice Hill (BAL) REC 3+,▲ L5 5/5 – 100% vs season 6/11 – 55%
+2026-11-24 11:01,NFL,LEAGUE TREND,Woody Marks (HOU) RUSH_YDS 50+,▲ L5 5/5 – 100% vs season 5/9 – 56%
+2026-11-24 11:01,NFL,LEAGUE TREND,Aaron Jones Sr. (MIN) RUSH_YDS 40+,▼ L5 1/5 – 20% vs season 6/10 – 60%
+2026-11-24 11:01,NFL,LEAGUE TREND,Bryce Young (CAR) PASS_YDS 275+,▼ L5 1/5 – 20% vs season 6/10 – 60%
+2026-11-24 11:01,NFL,LEAGUE TREND,C.J. Stroud (HOU) PASS_TD 3+,▲ L5 4/5 – 80% vs season 4/10 – 40%
+2026-11-24 11:01,NFL,LEAGUE TREND,Cade Otton (TB) REC 2+,▼ L5 1/5 – 20% vs season 6/10 – 60%
+2026-11-24 11:01,NFL,LEAGUE TREND,Cade Otton (TB) REC_YDS 10+,▼ L5 1/5 – 20% vs season 6/10 – 60%
+2026-11-24 11:01,NFL,LEAGUE TREND,Denzel Boston (CLE) REC_YDS 40+,▼ L5 1/5 – 20% vs season 6/10 – 60%
+2026-11-24 11:01,NFL,LEAGUE TREND,DK Metcalf (PIT) REC 3+,▼ L5 1/5 – 20% vs season 6/10 – 60%
+2026-11-24 11:01,NFL,DNP / INACTIVE,28 newly out,"Tahj Brooks (CIN), Robert Henry Jr. (WSH), Carson Beck (ARI), Chris Moore (BAL), Xavier Legette (CAR), Dalton Kincaid (BUF), Skyler Bell (BUF), Jalen Reagor (MIA), Kaytron Allen (MIA), Audric Estime (NO), Joshua Dobbs (DET), Israel Abanikanda (DAL), Tyjae Spears (TEN), Wan'Dale Robinson (TEN), KeAndre Lambert-Smith (LAC), Cade Klubnik (NYJ), Isaiah Williams (NYJ), Omar Cooper Jr. (NYJ), Brock Bowers (LV), Eli Stowers (PHI), Elijah Mitchell (PHI), Hollywood Brown (PHI), Brandon Smith (PIT), Lew Nichols (PIT), Mason Rudolph (PIT), Travis Homer (PIT), Demarcus Robinson (SF), Woody Marks (HOU) — not counted in hit rates"
+2026-11-24 11:01,NFL,LIMITED SNAPS,21 tracked players,"Mitchell Tinsley 3% snaps, Rachaad White 22% snaps, Devin Duvernay 4% snaps, Reggie Virgil 4% snaps, Josh Downs 24% snaps, Devontez Walker 14% snaps, Brycen Tremayne 24% snaps, Devin Singletary 16% snaps, Jameis Winston 7% snaps, Kyle Allen 1% snaps, Kevin Coleman Jr. 21% snaps, Alvin Kamara 11% snaps, Bryce Lance 29% snaps, Juwan Johnson 38% snaps, Keaton Mitchell 3% snaps, Theo Wease Jr. 5% snaps, Braelon Allen 37% snaps, J.K. Dobbins 1% snaps, Zach Ertz 11% snaps, Carson Wentz 10% snaps, Jacob Cowing 11% snaps — counted, but flagged"
+2026-11-24 11:01,NFL,UNVERIFIED,PENDING – single source (player not matched in nflverse) — 1 rows,Chris Manhertz 2026-11-08
 2026-11-24 04:03,NBA,RUN,NBA update,"98 games checked, 10 new or changed (269 player rows), 4s"
 2026-11-24 04:03,NBA,LEAGUE TREND,Kelly Oubre Jr. (IND) PTS 15+,▲ L5 5/5 – 100% vs season 7/16 – 44%
 2026-11-24 04:03,NBA,LEAGUE TREND,Harrison Barnes (SA) AST 2+,▲ L5 4/5 – 80% vs season 4/16 – 25%
