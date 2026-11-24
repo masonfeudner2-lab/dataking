@@ -945,3 +945,13 @@ th { font-weight: 600; font-size: 0.75rem; color: var(--muted); text-transform: 
   .browse .wide-only { display: none; }
   .browse tbody th { min-width: 0; }
 }
+
+/* Team search + team view in hit rates */
+.plist-head { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 14px 0 2px; }
+.prow.team .pname { color: var(--amber); }
+.team-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 10px 0 2px; }
+.team-head h2 { font-size: 1.9rem; }
+.filters label { min-width: 0; }
+.filters select { width: 100%; min-width: 0; text-overflow: ellipsis; }
+.filters label.wide { grid-column: span 2; }
+.nowrap { white-space: nowrap; }

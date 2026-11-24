@@ -4,6 +4,7 @@ import { SPORT_STATS, type StatCode } from "@/lib/props/config";
 import type { HitRow, Sport } from "@/lib/props/schema";
 import { loadProps } from "@/lib/props/server";
 import { heat, playerHref, splitFrac, STAT_LABEL } from "@/lib/props/view";
+import { teamFullName, teamInfo } from "@/lib/props/teams";
 
 const WINDOWS = { L5: ["L5", "L5_pct"], L10: ["L10", "L10_pct"], Season: ["Season", "season_pct"], Home: ["Home", "home_pct"], Away: ["Away", "away_pct"] } as const;
 type Win = keyof typeof WINDOWS;
@@ -23,14 +24,18 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
   const lines = ladder?.lines ?? [];
   const line = lines.includes(Number(one("line"))) ? Number(one("line")) : lines.includes(DEFAULT_LINE[stat]) ? DEFAULT_LINE[stat] : lines[0];
   const win = (one("win") in WINDOWS ? one("win") : "L10") as Win;
-  const minPct = one("min") === "" ? 80 : Math.max(0, Math.min(100, Number(one("min")) || 0));
-  const minGames = one("games") === "" ? 5 : Math.max(1, Number(one("games")) || 1);
+  const hit = (sport === "NBA" ? ds.nba.hit : ds.nfl.hit) as HitRow[];
+  // Team filter: only teams this sport's data actually has. A team view shows the whole roster by default.
+  const teamCodes = [...new Set(hit.map((h) => h.team).filter(Boolean))].sort((a, b) => teamFullName(sport, a).localeCompare(teamFullName(sport, b)));
+  const team = teamCodes.includes(one("team")) ? one("team") : "";
+  const minPct = one("min") === "" ? (team ? 0 : 80) : Math.max(0, Math.min(100, Number(one("min")) || 0));
+  const minGames = one("games") === "" ? (team ? 1 : 5) : Math.max(1, Number(one("games")) || 1);
   const order = one("sort") === "low" ? "low" : "high";
 
   const [fracKey, pctKey] = WINDOWS[win];
-  const hit = (sport === "NBA" ? ds.nba.hit : ds.nfl.hit) as HitRow[];
   const rows = hit
     .filter((h) => h.stat === stat && h._line === line)
+    .filter((h) => !team || h.team === team)
     .filter((h) => hn(h[fracKey])[1] >= minGames && h[pctKey] !== null)
     .filter((h) => (order === "high" ? (h[pctKey] as number) >= minPct : (h[pctKey] as number) <= 100 - minPct))
     .sort((a, b) => {
@@ -47,6 +52,12 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
       <AutoForm className="filters">
         <label>Sport
           <select name="sport" defaultValue={sport}><option>NBA</option><option>NFL</option></select>
+        </label>
+        <label className="wide">Team
+          <select name="team" defaultValue={team}>
+            <option value="">All teams</option>
+            {teamCodes.map((c) => <option key={c} value={c}>{teamInfo(sport, c) ? teamFullName(sport, c) : c}</option>)}
+          </select>
         </label>
         <label>Stat
           <select name="stat" defaultValue={stat}>{statList.map((s) => <option key={s} value={s}>{STAT_LABEL[s]}</option>)}</select>
@@ -74,10 +85,23 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
         <noscript><button className="btn" type="submit">Show</button></noscript>
       </AutoForm>
 
-      <p className="small muted">
-        {rows.length} {sport} players {order === "high" ? "hit" : "hit at most"} {STAT_LABEL[stat]} {line}+ in {order === "high" ? minPct : 100 - minPct}%{order === "high" ? "+" : ""} of their {win === "Season" ? "season" : win} games (min {minGames} games).
+      {team && (
+        <div className="team-head">
+          <h2>{teamFullName(sport, team)}</h2>
+          <a className="linkbtn small" href={`/props/browse?sport=${sport}&stat=${stat}&line=${line}&win=${win}`}>All teams ×</a>
+        </div>
+      )}
+      {team && minPct === 0 ? (
+        <p className="small muted">
+          {rows.length} {teamInfo(sport, team)?.name ?? team} players · {STAT_LABEL[stat]} {line}+ · {win === "Season" ? "this season" : win === "Home" || win === "Away" ? `${win.toLowerCase()} games` : `last ${win.slice(1)} games`}, {order === "high" ? "best" : "worst"} hit rate first.
+          {rows.length > shown.length && ` Showing the first ${shown.length}.`}
+        </p>
+      ) : (
+        <p className="small muted">
+        {rows.length} {team ? teamInfo(sport, team)?.name ?? team : sport} players {order === "high" ? "hit" : "hit at most"} {STAT_LABEL[stat]} {line}+ in {order === "high" ? minPct : 100 - minPct}%{order === "high" ? "+" : ""} of their {win === "Season" ? "season" : win} games (min {minGames} games).
         {rows.length > shown.length && ` Showing the first ${shown.length}.`}
       </p>
+      )}
 
       <div className="tablewrap">
         <table className="browse">
