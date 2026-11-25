@@ -1,4 +1,16 @@
 run_time_pt,sport,section,item,detail
+2026-11-25 10:55,NFL,RUN,NFL update,"27 games checked, 0 new or changed; nflverse stats loaded, snaps loaded; 3s"
+2026-11-25 10:55,NFL,LEAGUE TREND,Juwan Johnson (NO) REC 3+,▼ L5 0/5 – 0% vs season 5/10 – 50%
+2026-11-25 10:55,NFL,LEAGUE TREND,Justice Hill (BAL) REC 3+,▲ L5 5/5 – 100% vs season 6/11 – 55%
+2026-11-25 10:55,NFL,LEAGUE TREND,Woody Marks (HOU) RUSH_YDS 50+,▲ L5 5/5 – 100% vs season 5/9 – 56%
+2026-11-25 10:55,NFL,LEAGUE TREND,Aaron Jones Sr. (MIN) RUSH_YDS 40+,▼ L5 1/5 – 20% vs season 6/10 – 60%
+2026-11-25 10:55,NFL,LEAGUE TREND,Bryce Young (CAR) PASS_YDS 275+,▼ L5 1/5 – 20% vs season 6/10 – 60%
+2026-11-25 10:55,NFL,LEAGUE TREND,C.J. Stroud (HOU) PASS_TD 3+,▲ L5 4/5 – 80% vs season 4/10 – 40%
+2026-11-25 10:55,NFL,LEAGUE TREND,Cade Otton (TB) REC 2+,▼ L5 1/5 – 20% vs season 6/10 – 60%
+2026-11-25 10:55,NFL,LEAGUE TREND,Cade Otton (TB) REC_YDS 10+,▼ L5 1/5 – 20% vs season 6/10 – 60%
+2026-11-25 10:55,NFL,LEAGUE TREND,Denzel Boston (CLE) REC_YDS 40+,▼ L5 1/5 – 20% vs season 6/10 – 60%
+2026-11-25 10:55,NFL,LEAGUE TREND,DK Metcalf (PIT) REC 3+,▼ L5 1/5 – 20% vs season 6/10 – 60%
+2026-11-25 10:55,NFL,UNVERIFIED,PENDING – single source (player not matched in nflverse) — 1 rows,Chris Manhertz 2026-11-08
 2026-11-25 04:09,NBA,RUN,NBA update,"91 games checked, 5 new or changed (125 player rows), 3s"
 2026-11-25 04:09,NBA,BACKFILL,2 older games loaded,Per-game notes below cover only the last 3 days.
 2026-11-25 04:09,NBA,LEAGUE TREND,Kelly Oubre Jr. (IND) PTS 15+,▲ L5 5/5 – 100% vs season 7/16 – 44%
