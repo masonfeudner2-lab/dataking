@@ -1,27 +1,22 @@
 {
   "NBA": {
-    "scanFrom": "2026-11-21",
+    "scanFrom": "2026-11-22",
     "missing": [],
     "backfillDone": true,
     "lastRun": {
-      "at": "2026-11-24T12:03:47.256Z",
+      "at": "2026-11-25T12:09:02.669Z",
       "ok": true,
-      "gamesProcessed": 10,
+      "gamesProcessed": 5,
       "freshIds": [
-        "401910036",
-        "401910037",
-        "401910038",
-        "401910039",
-        "401910040",
-        "401910041",
-        "401910042",
-        "401910043",
-        "401910044",
-        "401910045"
+        "401910027",
+        "401910029",
+        "401909314",
+        "401909315",
+        "401909316"
       ],
-      "message": "98 games checked, 10 new or changed (269 player rows), 4s"
+      "message": "91 games checked, 5 new or changed (125 player rows), 3s"
     },
-    "lastSuccess": "2026-11-24T12:03:47.256Z",
+    "lastSuccess": "2026-11-25T12:09:02.669Z",
     "lastFullRefresh": "2026-11-19T08:13:29.338Z"
   },
   "NFL": {
