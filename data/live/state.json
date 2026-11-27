@@ -4,25 +4,13 @@
     "missing": [],
     "backfillDone": true,
     "lastRun": {
-      "at": "2026-11-26T12:07:04.166Z",
+      "at": "2026-11-27T12:02:18.067Z",
       "ok": true,
-      "gamesProcessed": 11,
-      "freshIds": [
-        "401910027",
-        "401910029",
-        "401909317",
-        "401909318",
-        "401909319",
-        "401909320",
-        "401909321",
-        "401909322",
-        "401909323",
-        "401909324",
-        "401909325"
-      ],
-      "message": "270 games checked, 11 new or changed (282 player rows), 8s"
+      "gamesProcessed": 0,
+      "freshIds": [],
+      "message": "87 games checked, 0 new or changed (0 player rows), 3s"
     },
-    "lastSuccess": "2026-11-26T12:07:04.166Z",
+    "lastSuccess": "2026-11-27T12:02:18.067Z",
     "lastFullRefresh": "2026-11-26T12:07:04.166Z"
   },
   "NFL": {
